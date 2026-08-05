@@ -3,399 +3,419 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seller Center - Dashboard Interaktif</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>AeroSport - Toko Peralatan Olahraga</title>
+    <!-- Menggunakan font Poppins dari Google Fonts untuk kesan modern & estetik -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ================= VARIABEL WARNA & RESET ================= */
+        /* CSS Variabel & Reset */
         :root {
-            --primary: #2563eb;
-            --sidebar-bg: #1e293b;
-            --sidebar-hover: #334155;
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            --primary: #FF5722; /* Oranye Neon / Energik */
+            --dark: #121212;
+            --light: #F8F9FA;
+            --gray: #888888;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
-
-        /* ================= SIDEBAR ================= */
-        .sidebar {
-            width: 260px; background-color: var(--sidebar-bg); color: white;
-            display: flex; flex-direction: column; transition: all 0.3s ease; z-index: 100;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-        .logo-area {
-            padding: 20px; font-size: 20px; font-weight: 700;
-            border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px;
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
         }
-        .logo-area i.fa-store { color: #38bdf8; }
-        .close-sidebar { display: none; margin-left: auto; cursor: pointer; font-size: 20px; color: #94a3b8; }
-        
-        .nav-menu { list-style: none; padding: 20px 0; flex: 1; overflow-y: auto; }
-        .nav-item a {
-            display: flex; align-items: center; padding: 12px 20px; color: #cbd5e1;
-            text-decoration: none; gap: 15px; transition: 0.2s; cursor: pointer;
+
+        /* Navigasi / Header */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .nav-item a:hover, .nav-item.active a { background-color: var(--sidebar-hover); color: white; border-left: 4px solid var(--primary); }
-        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; }
 
-        /* ================= MAIN CONTENT & HEADER ================= */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; width: 100%; }
-        .header {
-            height: 70px; background-color: var(--card-bg); border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 30px; position: sticky; top: 0; z-index: 10;
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--dark);
+            letter-spacing: -1px;
         }
-        .menu-toggle { display: none; font-size: 24px; cursor: pointer; color: var(--text-main); margin-right: 15px; }
-        .header-left { display: flex; align-items: center; flex: 1; }
-        .search-bar { display: flex; align-items: center; background-color: var(--bg-color); padding: 8px 15px; border-radius: 8px; max-width: 400px; width: 100%; }
-        .search-bar input { border: none; background: transparent; outline: none; width: 100%; margin-left: 10px; }
-        
-        .header-icons { display: flex; align-items: center; gap: 20px; color: var(--text-muted); }
-        .header-icons i { font-size: 18px; cursor: pointer; transition: 0.2s; }
-        .profile-area { display: flex; align-items: center; gap: 10px; padding-left: 20px; border-left: 1px solid var(--border); font-weight: 500; }
 
-        /* ================= PAGE CONTAINER ================= */
-        .content-area { padding: 30px; }
-        .page-section { display: none; /* Disembunyikan secara default, JS akan mengaturnya */ animation: fadeIn 0.3s; }
-        .page-section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ================= KOMPONEN UMUM ================= */
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .page-title { font-size: 24px; font-weight: 600; }
-        .btn-primary { background-color: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: 500; }
-        .btn-primary:hover { background-color: #1d4ed8; }
-        
-        .card { background-color: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; }
-        
-        /* Grid Metrik */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background-color: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
-        .stat-value { font-size: 28px; font-weight: 700; margin: 10px 0; }
-        
-        /* Kategori Produk */
-        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .category-card { background-color: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-        .category-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .icon-food { background-color: #fef08a; color: #ca8a04; } .icon-tech { background-color: #e0f2fe; color: #0284c7; }
-        
-        /* Tabel */
-        .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th, td { text-align: left; padding: 12px 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        th { background-color: #f8fafc; color: var(--text-muted); font-weight: 600; }
-        .status-badge { padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .status-red { background-color: #fee2e2; color: #ef4444; }
-        .status-green { background-color: #dcfce7; color: #16a34a; }
-
-        /* ================= RESPONSIVE ================= */
-        @media (max-width: 992px) {
-            .sidebar { position: fixed; left: -260px; height: 100vh; }
-            .sidebar.show { left: 0; }
-            .sidebar-overlay.show { display: block; }
-            .menu-toggle, .close-sidebar { display: block; }
-            .profile-area span { display: none; }
+        .logo span {
+            color: var(--primary);
         }
-        @media (max-width: 576px) {
-            .header { padding: 0 15px; } .content-area { padding: 15px; }
-            .search-bar { display: none; }
-            .stats-grid, .category-grid { grid-template-columns: 1fr; }
-            .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .cart-btn {
+            background: var(--dark);
+            color: #ffffff;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-btn:hover {
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        /* Bagian Hero (Spanduk Utama) */
+        .hero {
+            height: 80vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1600&q=80') center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #ffffff;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 35px;
+            font-weight: 300;
+            max-width: 600px;
+            color: #E0E0E0;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+            padding: 16px 40px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 87, 34, 0.4);
+        }
+
+        /* Bagian Produk */
+        .products-section {
+            padding: 80px 5%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 60px;
+            position: relative;
+            color: var(--dark);
+        }
+
+        .section-title::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            display: block;
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Kartu Produk yang Estetik */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--dark);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            z-index: 2;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .category {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            margin: 8px 0 15px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .add-btn {
+            background: var(--dark);
+            color: #fff;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: #ffffff;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 50px;
+        }
+
+        footer p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsivitas untuk mobile */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none; /* Disembunyikan di mobile untuk simplicity di mockup ini */
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <div class="logo-area">
-            <i class="fa-solid fa-store"></i> SellerHub
-            <i class="fa-solid fa-xmark close-sidebar" id="closeSidebar"></i>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item active" id="nav-beranda" onclick="switchPage('beranda')"><a><i class="fa-solid fa-house"></i> Beranda</a></li>
-            <li class="nav-item" id="nav-produk" onclick="switchPage('produk')"><a><i class="fa-solid fa-box"></i> Produk</a></li>
-            <li class="nav-item" id="nav-pesanan" onclick="switchPage('pesanan')"><a><i class="fa-solid fa-cart-shopping"></i> Pesanan</a></li>
-            <li class="nav-item" id="nav-statistik" onclick="switchPage('statistik')"><a><i class="fa-solid fa-chart-simple"></i> Statistik</a></li>
-            <li class="nav-item" id="nav-keuangan" onclick="switchPage('keuangan')"><a><i class="fa-solid fa-wallet"></i> Keuangan</a></li>
-            <li class="nav-item" id="nav-promosi" onclick="switchPage('promosi')"><a><i class="fa-solid fa-bullhorn"></i> Promosi</a></li>
-            <li class="nav-item" id="nav-pengaturan" onclick="switchPage('pengaturan')"><a><i class="fa-solid fa-gear"></i> Pengaturan</a></li>
+    <!-- Navigasi -->
+    <nav>
+        <a href="#" class="logo">Aero<span>Sport</span></a>
+        <ul class="nav-links">
+            <li><a href="#">Beranda</a></li>
+            <li><a href="#produk">Koleksi</a></li>
+            <li><a href="#">Pria</a></li>
+            <li><a href="#">Wanita</a></li>
         </ul>
-    </aside>
+        <button class="cart-btn" onclick="openCart()">
+            🛒 <span id="cart-count">0</span> Item
+        </button>
+    </nav>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-left">
-                <i class="fa-solid fa-bars menu-toggle" id="menuToggle"></i>
-                <div class="search-bar">
-                    <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                    <input type="text" placeholder="Cari pesanan, produk...">
+    <!-- Bagian Hero -->
+    <header class="hero">
+        <h1>Tembus <span>Batasmu</span></h1>
+        <p>Temukan peralatan olahraga premium yang dirancang khusus untuk meningkatkan performa dan gaya Anda di setiap gerakan.</p>
+        <a href="#produk" class="btn-primary">Belanja Sekarang</a>
+    </header>
+
+    <!-- Bagian Produk -->
+    <section id="produk" class="products-section">
+        <h2 class="section-title">Koleksi Terbaru</h2>
+        
+        <div class="grid">
+            <!-- Produk 1 -->
+            <div class="card">
+                <div class="card-img-wrapper">
+                    <span class="badge">BARU</span>
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Sepatu Lari Merah">
+                </div>
+                <div class="card-content">
+                    <p class="category">Sepatu Lari</p>
+                    <h3 class="card-title">Aero Velocity X</h3>
+                    <div class="price-row">
+                        <span class="price">Rp 1.299.000</span>
+                        <button class="add-btn" onclick="addToCart('Aero Velocity X')" title="Tambah ke Keranjang">+</button>
+                    </div>
                 </div>
             </div>
-            <div class="header-icons">
-                <i class="fa-regular fa-bell"></i>
-                <i class="fa-regular fa-comment-dots"></i>
-                <div class="profile-area">
-                    <i class="fa-regular fa-circle-user fa-lg"></i>
-                    <span>Toko Maju Jaya</span>
+
+            <!-- Produk 2 -->
+            <div class="card">
+                <div class="card-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=600&q=80" alt="Dumbbell Besi">
+                </div>
+                <div class="card-content">
+                    <p class="category">Peralatan Gym</p>
+                    <h3 class="card-title">IronCore Dumbbell 10kg</h3>
+                    <div class="price-row">
+                        <span class="price">Rp 450.000</span>
+                        <button class="add-btn" onclick="addToCart('IronCore Dumbbell')" title="Tambah ke Keranjang">+</button>
+                    </div>
                 </div>
             </div>
-        </header>
 
-        <div class="content-area">
+            <!-- Produk 3 -->
+            <div class="card">
+                <div class="card-img-wrapper">
+                    <span class="badge" style="background: var(--primary);">PROMO</span>
+                    <img src="https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=600&q=80" alt="Bola Basket">
+                </div>
+                <div class="card-content">
+                    <p class="category">Olahraga Bola</p>
+                    <h3 class="card-title">ProGrip Basketball</h3>
+                    <div class="price-row">
+                        <span class="price">Rp 780.000</span>
+                        <button class="add-btn" onclick="addToCart('ProGrip Basketball')" title="Tambah ke Keranjang">+</button>
+                    </div>
+                </div>
+            </div>
             
-            <!-- ================= HALAMAN: BERANDA ================= -->
-            <div id="page-beranda" class="page-section active">
-                <div class="page-header">
-                    <h1 class="page-title">👋 Selamat Pagi, Toko Maju Jaya!</h1>
+            <!-- Produk 4 -->
+            <div class="card">
+                <div class="card-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=600&q=80" alt="Matras Yoga">
                 </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div style="color:var(--text-muted); font-size:14px;">Pendapatan Hari Ini</div>
-                        <div class="stat-value">Rp 4.500.000</div>
-                        <div style="color:var(--success); font-size:13px;"><i class="fa-solid fa-arrow-trend-up"></i> +15% vs kemarin</div>
-                    </div>
-                    <div class="stat-card">
-                        <div style="color:var(--text-muted); font-size:14px;">Pesanan Baru</div>
-                        <div class="stat-value">12</div>
-                        <div style="color:var(--success); font-size:13px;"><i class="fa-solid fa-arrow-trend-up"></i> +2 vs kemarin</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2 style="font-size:18px; margin-bottom:15px;">Katalog Kategori Referensi</h2>
-                    <div class="category-grid" style="margin-bottom:0;">
-                        <div class="category-card">
-                            <div class="category-icon icon-food"><i class="fa-solid fa-burger"></i></div>
-                            <div><h4>Makanan & Minuman</h4><p style="font-size:12px; color:gray;">Keripik, Kopi (Rp15k-75k)</p></div>
-                        </div>
-                        <div class="category-card">
-                            <div class="category-icon icon-tech"><i class="fa-solid fa-mobile-screen"></i></div>
-                            <div><h4>Elektronik & Gadget</h4><p style="font-size:12px; color:gray;">TWS, Powerbank (Rp50k-1M)</p></div>
-                        </div>
+                <div class="card-content">
+                    <p class="category">Yoga & Pilates</p>
+                    <h3 class="card-title">ZenFlow Yoga Mat</h3>
+                    <div class="price-row">
+                        <span class="price">Rp 320.000</span>
+                        <button class="add-btn" onclick="addToCart('ZenFlow Yoga Mat')" title="Tambah ke Keranjang">+</button>
                     </div>
                 </div>
             </div>
-
-            <!-- ================= HALAMAN: PRODUK ================= -->
-            <div id="page-produk" class="page-section">
-                <div class="page-header">
-                    <h1 class="page-title">Daftar Produk</h1>
-                    <button class="btn-primary"><i class="fa-solid fa-plus"></i> Tambah Produk</button>
-                </div>
-                <div class="card">
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Info Produk</th>
-                                    <th>Kategori</th>
-                                    <th>Harga</th>
-                                    <th>Stok</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Keripik Singkong Pedas</strong><br><span style="font-size:12px; color:gray;">SKU: KRP-01</span></td>
-                                    <td>Makanan</td>
-                                    <td>Rp 45.000</td>
-                                    <td>150</td>
-                                    <td><a href="#" style="color:var(--primary); text-decoration:none;">Edit</a></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Kaos Polos Hitam M</strong><br><span style="font-size:12px; color:gray;">SKU: KS-H-M</span></td>
-                                    <td>Pakaian</td>
-                                    <td>Rp 120.000</td>
-                                    <td>45</td>
-                                    <td><a href="#" style="color:var(--primary); text-decoration:none;">Edit</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= HALAMAN: PESANAN ================= -->
-            <div id="page-pesanan" class="page-section">
-                <div class="page-header">
-                    <h1 class="page-title">Manajemen Pesanan</h1>
-                </div>
-                <!-- Dummy Tabs -->
-                <div style="display:flex; gap:20px; border-bottom:1px solid var(--border); margin-bottom:20px; padding-bottom:10px;">
-                    <strong style="color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:10px;">Semua Pesanan</strong>
-                    <span style="color:var(--text-muted); cursor:pointer;">Belum Bayar (2)</span>
-                    <span style="color:var(--text-muted); cursor:pointer;">Perlu Dikirim (5)</span>
-                    <span style="color:var(--text-muted); cursor:pointer;">Selesai</span>
-                </div>
-                <div class="card">
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID Pesanan</th>
-                                    <th>Produk</th>
-                                    <th>Kurir</th>
-                                    <th>Total Pembayaran</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>#INV-001</strong><br><span style="font-size:12px; color:gray;">Budi Santoso</span></td>
-                                    <td>Keripik Singkong (1kg)</td>
-                                    <td>JNE Reguler</td>
-                                    <td>Rp 45.000</td>
-                                    <td><span class="status-badge status-red">Perlu Dikirim</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>#INV-998</strong><br><span style="font-size:12px; color:gray;">Siti Aminah</span></td>
-                                    <td>Earphone TWS Bluetooth</td>
-                                    <td>GoSend</td>
-                                    <td>Rp 185.000</td>
-                                    <td><span class="status-badge status-green">Selesai</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= HALAMAN: STATISTIK ================= -->
-            <div id="page-statistik" class="page-section">
-                <div class="page-header">
-                    <h1 class="page-title">Statistik Penjualan</h1>
-                </div>
-                <div class="card" style="height: 300px; display:flex; align-items:center; justify-content:center; background:#f8fafc; border:2px dashed #cbd5e1;">
-                    <div style="text-align:center; color:var(--text-muted);">
-                        <i class="fa-solid fa-chart-line fa-3x" style="margin-bottom:15px; color:#94a3b8;"></i>
-                        <h3>Grafik Penjualan Sedang Disiapkan</h3>
-                        <p>Pantau trafik dan konversi toko Anda di sini.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= HALAMAN: KEUANGAN ================= -->
-            <div id="page-keuangan" class="page-section">
-                <div class="page-header">
-                    <h1 class="page-title">Saldo & Keuangan</h1>
-                    <button class="btn-primary">Tarik Dana</button>
-                </div>
-                <div class="card" style="display:flex; align-items:center; gap:20px;">
-                    <i class="fa-solid fa-wallet fa-3x" style="color:var(--primary);"></i>
-                    <div>
-                        <div style="color:var(--text-muted); font-size:14px;">Saldo Tersedia</div>
-                        <div style="font-size:32px; font-weight:700;">Rp 8.750.000</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ================= HALAMAN: PROMOSI ================= -->
-            <div id="page-promosi" class="page-section">
-                <div class="page-header">
-                    <h1 class="page-title">Pusat Promosi</h1>
-                    <button class="btn-primary"><i class="fa-solid fa-plus"></i> Buat Voucher</button>
-                </div>
-                <div class="card" style="text-align:center; padding:50px 20px;">
-                    <i class="fa-solid fa-ticket fa-3x" style="color:#fbbf24; margin-bottom:15px;"></i>
-                    <h3>Belum ada promosi aktif</h3>
-                    <p style="color:var(--text-muted); margin-top:10px;">Buat voucher atau diskon untuk menarik lebih banyak pembeli.</p>
-                </div>
-            </div>
-
-            <!-- ================= HALAMAN: PENGATURAN ================= -->
-            <div id="page-pengaturan" class="page-section">
-                <div class="page-header">
-                    <h1 class="page-title">Pengaturan Toko</h1>
-                    <button class="btn-primary">Simpan Perubahan</button>
-                </div>
-                <div class="card">
-                    <h3 style="margin-bottom:15px;">Profil Toko</h3>
-                    <div style="margin-bottom:15px;">
-                        <label style="display:block; font-size:14px; font-weight:600; margin-bottom:5px;">Nama Toko</label>
-                        <input type="text" value="Toko Maju Jaya" style="width:100%; max-width:400px; padding:10px; border:1px solid var(--border); border-radius:6px; outline:none;">
-                    </div>
-                    <div>
-                        <label style="display:block; font-size:14px; font-weight:600; margin-bottom:5px;">Deskripsi</label>
-                        <textarea style="width:100%; max-width:400px; padding:10px; border:1px solid var(--border); border-radius:6px; outline:none; height:100px;">Toko serba ada yang menjual makanan dan elektronik berkualitas.</textarea>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </main>
+    </section>
 
-    <!-- ================= JAVASCRIPT UNTUK INTERAKTIF ================= -->
+    <!-- Footer -->
+    <footer>
+        <h2 class="logo" style="color: white; margin-bottom: 10px;">Aero<span style="color: var(--primary);">Sport</span></h2>
+        <p>&copy; 2026 AeroSport Indonesia. Mockup Desain Sederhana.</p>
+    </footer>
+
+    <!-- JavaScript Sederhana untuk Interaksi -->
     <script>
-        // FUNGSI UNTUK PINDAH HALAMAN (SPA ROUTING)
-        function switchPage(pageId) {
-            // 1. Sembunyikan semua konten halaman
-            const allPages = document.querySelectorAll('.page-section');
-            allPages.forEach(page => {
-                page.classList.remove('active');
-            });
+        let cartCount = 0;
 
-            // 2. Tampilkan halaman yang diklik
-            const targetPage = document.getElementById('page-' + pageId);
-            if (targetPage) {
-                targetPage.classList.add('active');
-            }
+        function addToCart(productName) {
+            cartCount++;
+            document.getElementById('cart-count').innerText = cartCount;
+            
+            // Animasi kecil pada tombol keranjang
+            const cartBtn = document.querySelector('.cart-btn');
+            cartBtn.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                cartBtn.style.transform = 'scale(1)';
+            }, 200);
 
-            // 3. Hapus status 'active' dari semua menu sidebar
-            const allNavItems = document.querySelectorAll('.nav-item');
-            allNavItems.forEach(nav => {
-                nav.classList.remove('active');
-            });
-
-            // 4. Tambahkan status 'active' ke menu yang diklik
-            const targetNav = document.getElementById('nav-' + pageId);
-            if (targetNav) {
-                targetNav.classList.add('active');
-            }
-
-            // 5. Otomatis tutup sidebar jika diakses dari layar HP
-            if (window.innerWidth <= 992) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-            }
+            // Notifikasi sederhana
+            alert(productName + " berhasil ditambahkan ke keranjang!");
         }
 
-        // KODE UNTUK TOMBOL MENU DI HP (HAMBURGER MENU)
-        const menuToggle = document.getElementById('menuToggle');
-        const closeSidebar = document.getElementById('closeSidebar');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.add('show');
-            overlay.classList.add('show');
-        });
-
-        closeSidebar.addEventListener('click', () => {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        });
-
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        });
+        function openCart() {
+            if(cartCount === 0) {
+                alert("Keranjang belanja Anda masih kosong.");
+            } else {
+                alert("Anda memiliki " + cartCount + " item di keranjang. (Fitur checkout belum tersedia di mockup ini)");
+            }
+        }
     </script>
 </body>
 </html>
