@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AROS - Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' } }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f9ff; }
+        ::-webkit-scrollbar-thumb { background: #0284c7; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .input-minimal { width: 100%; border: none; border-bottom: 1px solid #bae6fd; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #0c4a6e;}
+        .input-minimal:focus { border-bottom-color: #0284c7; }
+        .view-hidden { display: none !important; }
+    </style>
+</head>
+<body class="font-sans bg-brand-50 text-brand-900 antialiased">
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-brand-600 text-white px-6 py-3 rounded-lg shadow-lg shadow-brand-500/30 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-check-circle"></i>
+        <span id="toast-message">Notifikasi</span>
+    </div>
+
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-white border-r border-brand-100 flex flex-col shadow-sm z-10">
+            <div class="p-8 border-b border-brand-100 bg-brand-600 text-white">
+                <h2 class="text-2xl font-bold tracking-tighter">AROS</h2>
+                <p class="text-xs uppercase tracking-widest text-brand-100 mt-1">Admin Panel</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="showAdminMenu('admin-dash')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors font-medium">Dashboard</button>
+                <button onclick="showAdminMenu('admin-products')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Katalog Produk</button>
+                <button onclick="showAdminMenu('admin-input')" class="w-full text-left px-4 py-3 rounded text-sm bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors font-semibold shadow-sm">+ Input Barang</button>
+                <button onclick="showAdminMenu('admin-history')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">History Akun</button>
+                <button onclick="showAdminMenu('admin-customers')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Data Pelanggan</button>
+                <button onclick="showAdminMenu('admin-reports')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Produk</button>
+                <button onclick="showAdminMenu('admin-daily')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Harian</button>
+            </nav>
+            <div class="p-4 border-t border-brand-100">
+                <a href="index.html" class="block w-full text-center px-4 py-3 text-sm text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors font-semibold">Log Out</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12 overflow-y-auto">
+            
+            <!-- Dashboard -->
+            <div id="admin-dash" class="admin-section fade-in">
+                <h3 class="text-2xl font-bold mb-2">Overview Kinerja</h3>
+                <p class="text-brand-500 mb-8">Data real-time toko baru.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Produk</p>
+                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-product">0</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Terjual</p>
+                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-sold">0</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm bg-gradient-to-br from-brand-600 to-brand-900 text-white">
+                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2">Pendapatan Bersih</p>
+                        <h4 class="text-3xl font-bold" id="stat-total-revenue">Rp 0</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Katalog Produk -->
+            <div id="admin-products" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-8">Katalog Produk AROS</h3>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-brand-50 text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga</th><th class="p-4 font-semibold">Stok</th><th class="p-4 font-semibold">Terjual</th></tr>
+                        </thead>
+                        <tbody id="admin-product-table-body" class="divide-y divide-brand-50"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Input Barang -->
+            <div id="admin-input" class="admin-section view-hidden fade-in">
+                <div class="max-w-2xl bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
+                    <h3 class="text-2xl font-bold mb-6 text-brand-600">Tambah Produk Baru</h3>
+                    <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Kode Sepatu</label><input type="text" id="inp-code" class="input-minimal mt-2" required placeholder="AR-001"></div>
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Harga (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
+                        </div>
+                        <div><label class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
+                        </div>
+                        <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan & Sinkronisasi</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- History Akun -->
+            <div id="admin-history" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-8">History Akun Customer</h3>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr><th class="p-3">Nickname</th><th class="p-3">Tanggal Join</th><th class="p-3">Status Akun</th></tr>
+                        </thead>
+                        <tbody id="admin-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Data Pelanggan (Transaksi) -->
+            <div id="admin-customers" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-8">Data Transaksi Pelanggan</h3>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr><th class="p-3">Nama Pembeli</th><th class="p-3">Kontak / Alamat</th><th class="p-3">Produk Dibeli</th><th class="p-3">Total Bayar</th></tr>
+                        </thead>
+                        <tbody id="admin-orders-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Laporan Produk -->
+            <div id="admin-reports" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-2">Laporan & Statistik Produk</h3>
+                <p class="text-brand-500 mb-8">Perbandingan stok masuk dengan volume produk keluar.</p>
+                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm space-y-8 max-w-3xl" id="report-bars-container"></div>
+            </div>
+
+            <!-- Laporan Harian -->
+            <div id="admin-daily" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-2">Laporan Finansial Harian</h3>
+                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm"><p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pemasukan</p><h4 class="text-2xl font-bold text-brand-600" id="daily-income">Rp 0</h4></div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm"><p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pengeluaran</p><h4 class="text-2xl font-bold text-red-500">Rp 0</h4></div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm bg-brand-600 text-white"><p class="text-xs uppercase tracking-widest text-brand-100 mb-2">Laba Bersih</p><h4 class="text-2xl font-bold" id="daily-profit">Rp 0</h4></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Inisialisasi data kosong (seperti website baru)
+        let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+        let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+        let orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+
+        const showToast = (msg) => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        };
+
+        const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+
+        const showAdminMenu = (sectionId) => {
+            document.querySelectorAll('.admin-section').forEach(el => el.classList.add('view-hidden'));
+            document.getElementById(sectionId).classList.remove('view-hidden');
+            if(sectionId === 'admin-reports') renderReportBars();
+            if(sectionId === 'admin-history') renderHistoryTable();
+            if(sectionId === 'admin-customers') renderOrdersTable();
+        };
+
+        const renderAdminData = () => {
+            document.getElementById('stat-total-product').innerText = products.length;
+            
+            let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
+            let totalRev = orders.reduce((acc, o) => acc + o.total, 0);
+
+            document.getElementById('stat-total-sold').innerText = totalSold;
+            document.getElementById('stat-total-revenue').innerText = formatRupiah(totalRev);
+            document.getElementById('daily-income').innerText = formatRupiah(totalRev);
+            document.getElementById('daily-profit').innerText = formatRupiah(totalRev);
+
+            const tbody = document.getElementById('admin-product-table-body');
+            tbody.innerHTML = '';
+            
+            if(products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-brand-400">Belum ada produk. Silakan tambah barang baru di menu "+ Input Barang".</td></tr>`;
+                return;
+            }
+
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-brand-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 flex items-center gap-4">
+                        <img src="${p.imageUrl}" class="w-12 h-12 rounded-lg object-cover bg-brand-100 shadow-sm">
+                        <div><p class="font-bold text-brand-900">${p.name}</p><p class="text-xs text-brand-500 font-mono">${p.code}</p></div>
+                    </td>
+                    <td class="p-4 font-medium">${formatRupiah(p.price)}</td>
+                    <td class="p-4"><span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span></td>
+                    <td class="p-4 font-medium text-brand-600">${p.sold || 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        const renderHistoryTable = () => {
+            const tbody = document.getElementById('admin-history-table');
+            tbody.innerHTML = '';
+            if(customers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-brand-400">Belum ada akun customer yang terdaftar.</td></tr>`;
+                return;
+            }
+            customers.forEach(c => {
+                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${c.name}</td><td class="p-3">${c.date}</td><td class="p-3 text-emerald-600 font-medium">${c.status}</td></tr>`;
+            });
+        };
+
+        const renderOrdersTable = () => {
+            const tbody = document.getElementById('admin-orders-table');
+            tbody.innerHTML = '';
+            if(orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-brand-400">Belum ada transaksi pesanan masuk.</td></tr>`;
+                return;
+            }
+            orders.forEach(o => {
+                let itemsList = o.items.map(i => `${i.name} (x${i.qty})`).join(', ');
+                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${o.name}</td><td class="p-3 text-xs">${o.phone}<br>${o.address}</td><td class="p-3 text-xs">${itemsList}</td><td class="p-3 font-bold text-brand-600">${formatRupiah(o.total)}</td></tr>`;
+            });
+        };
+
+        const renderReportBars = () => {
+            const container = document.getElementById('report-bars-container');
+            container.innerHTML = '';
+            if(products.length === 0) {
+                container.innerHTML = `<p class="text-brand-400">Belum ada data laporan produk.</p>`;
+                return;
+            }
+
+            products.forEach(p => {
+                const sold = p.sold || 0;
+                const totalIn = p.stock + sold;
+                const percentage = totalIn > 0 ? Math.round((sold / totalIn) * 100) : 0;
+
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between text-sm mb-2 font-semibold">
+                        <span class="text-brand-900">${p.name} <span class="text-xs text-brand-400 font-mono">(${p.code})</span></span>
+                        <span class="text-brand-600">Terjual: ${sold} / Stok Sisa: ${p.stock}</span>
+                    </div>
+                    <div class="w-full bg-brand-100 h-3 rounded-full overflow-hidden">
+                        <div class="bg-brand-600 h-3 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        const handleAdminAddProduct = (e) => {
+            e.preventDefault();
+            const newProduct = {
+                id: Date.now(),
+                code: document.getElementById('inp-code').value,
+                name: document.getElementById('inp-name').value,
+                price: parseFloat(document.getElementById('inp-price').value),
+                stock: parseInt(document.getElementById('inp-stock').value),
+                sold: 0,
+                imageUrl: document.getElementById('inp-image').value,
+                sizes: [39, 40, 41, 42, 43]
+            };
+
+            products.push(newProduct);
+            localStorage.setItem('aros_products', JSON.stringify(products));
+            
+            renderAdminData();
+            showToast('Produk Berhasil Ditambahkan ke Katalog Customer!');
+            e.target.reset();
+            showAdminMenu('admin-products');
+        };
+
+        document.addEventListener('DOMContentLoaded', renderAdminData);
+    </script>
+</body>
+</html>
