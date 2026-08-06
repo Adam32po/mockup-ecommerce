@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AROS - Secure Portal</title>
+    <title>AROS - Welcome</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,87 +13,170 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' } }
+                    colors: {
+                        brand: { blue: '#2a75d3', dark: '#112240', light: '#f4f7fb' }
+                    }
                 }
             }
         }
     </script>
     
     <style>
-        .input-minimal { width: 100%; border: none; border-bottom: 1px solid #bae6fd; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #0c4a6e; }
-        .input-minimal:focus { border-bottom-color: #0284c7; }
-        .input-dark-minimal { width: 100%; border: none; border-bottom: 1px solid #0369a1; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #ffffff; }
-        .input-dark-minimal:focus { border-bottom-color: #ffffff; }
-        .fade-in { animation: fadeIn 0.6s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateX(10px); } 
+            to { opacity: 1; transform: translateX(0); } 
+        }
+        
+        /* Custom Checkbox */
+        input[type="checkbox"] {
+            accent-color: #2a75d3;
+            width: 14px; height: 14px;
+        }
+        
+        .hidden-form { display: none !important; }
     </style>
 </head>
-<body class="font-sans bg-brand-50 text-brand-900 antialiased min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+<body class="font-sans bg-gradient-to-br from-indigo-200 via-purple-200 to-blue-200 antialiased min-h-screen flex items-center justify-center p-4">
 
-    <!-- Background Estetik -->
-    <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=2000&q=80" alt="AROS Background" class="w-full h-full object-cover opacity-20 grayscale">
-        <div class="absolute inset-0 bg-gradient-to-tr from-brand-900/60 to-brand-500/20"></div>
-    </div>
-
-    <!-- Dual Login Card Portal -->
-    <div class="w-full max-w-4xl bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row fade-in relative z-10 border border-white/50">
+    <!-- Main Card Container -->
+    <div class="w-full max-w-[850px] bg-brand-light shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row relative z-10">
         
-        <!-- Customer Portal -->
-        <div class="w-full md:w-1/2 p-10 md:p-14 border-b md:border-b-0 md:border-r border-brand-100 flex flex-col justify-center">
-            <div class="text-center mb-8">
-                <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
-                    <i class="fa-solid fa-bag-shopping text-xl"></i>
+        <!-- Left Panel (Dark Blue / Image Overlay) -->
+        <div class="w-full md:w-5/12 relative p-10 md:p-12 flex flex-col justify-between min-h-[300px] md:min-h-[550px]">
+            <!-- Background Image & Gradient -->
+            <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=800&q=80" class="absolute inset-0 w-full h-full object-cover z-0 grayscale">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-900/95 to-brand-dark/95 z-0"></div>
+
+            <!-- Logo -->
+            <div class="relative z-10 flex items-center gap-3">
+                <div class="w-5 h-5 rounded-full bg-white flex items-center justify-center">
+                    <div class="w-2 h-2 rounded-full bg-blue-900"></div>
                 </div>
-                <h2 class="text-2xl font-bold tracking-tight text-brand-900">Customer Access</h2>
-                <p class="text-xs uppercase tracking-widest text-brand-500 mt-1">Belanja & Eksplorasi Produk</p>
+                <span class="font-bold tracking-widest text-white text-lg">AROS</span>
             </div>
-            
-            <form onsubmit="handleCustomerLogin(event)" class="space-y-5">
-                <div>
-                    <label class="text-[11px] uppercase tracking-widest text-brand-500 font-semibold">Nickname / Nama</label>
-                    <input type="text" id="cust-name" class="input-minimal" placeholder="Contoh: AlexRider" required>
-                </div>
-                <div>
-                    <label class="text-[11px] uppercase tracking-widest text-brand-500 font-semibold">Password Keamanan</label>
-                    <input type="password" id="cust-pass" class="input-minimal" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="w-full bg-brand-600 text-white py-4 rounded-xl uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30 mt-4 flex items-center justify-center gap-2">
-                    Masuk Belanja <i class="fa-solid fa-arrow-right"></i>
+
+            <!-- Text Content & Toggle Button -->
+            <div class="relative z-10 mt-16 md:mt-auto">
+                <h1 id="welcome-title" class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight tracking-tight">Hello,<br>welcome!</h1>
+                <p id="welcome-desc" class="text-xs md:text-sm text-blue-100/70 mb-8 leading-relaxed max-w-xs">Platform sepatu olahraga performa tinggi. Silakan masuk untuk mulai mengeksplorasi produk kami.</p>
+                
+                <!-- Tombol Switch Form -->
+                <button type="button" onclick="toggleView()" id="toggle-btn" class="border border-white/60 text-white px-6 py-2.5 rounded-full text-xs font-semibold hover:bg-white hover:text-brand-dark transition-colors duration-300">
+                    Masuk sebagai Admin
                 </button>
-            </form>
+            </div>
         </div>
 
-        <!-- Admin Portal -->
-        <div class="w-full md:w-1/2 p-10 md:p-14 bg-brand-900 text-white flex flex-col justify-center relative overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand-700 rounded-full blur-3xl opacity-50"></div>
+        <!-- Right Panel (Forms) -->
+        <div class="w-full md:w-7/12 p-10 md:p-16 flex flex-col justify-center bg-white">
             
-            <div class="text-center mb-8 relative z-10">
-                <div class="w-12 h-12 bg-brand-800 text-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
-                    <i class="fa-solid fa-lock text-xl"></i>
+            <!-- FORM 1: CUSTOMER LOGIN -->
+            <form id="customer-form" onsubmit="handleCustomerLogin(event)" class="space-y-4 fade-in">
+                <!-- Input Box 1 -->
+                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
+                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Nickname / Nama</label>
+                    <input type="text" id="cust-name" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="Contoh: AlexRider" required>
                 </div>
-                <h2 class="text-2xl font-bold tracking-tight">Admin Workspace</h2>
-                <p class="text-xs uppercase tracking-widest text-brand-200 mt-1">Manajemen & Laporan Toko</p>
-            </div>
-            
-            <form onsubmit="handleAdminLogin(event)" class="space-y-5 relative z-10">
-                <div>
-                    <label class="text-[11px] uppercase tracking-widest text-brand-200 font-semibold">ID Admin / Nickname</label>
-                    <input type="text" id="admin-id" class="input-dark-minimal" placeholder="Contoh: ADM-001" required>
+                
+                <!-- Input Box 2 -->
+                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
+                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Password</label>
+                    <input type="password" id="cust-pass" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="••••••••" required>
                 </div>
-                <div>
-                    <label class="text-[11px] uppercase tracking-widest text-brand-200 font-semibold">Password Akses</label>
-                    <input type="password" id="admin-pass" class="input-dark-minimal" placeholder="••••••••" required>
+
+                <!-- Remember & Forgot -->
+                <div class="flex justify-between items-center px-2 py-2">
+                    <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer font-medium">
+                        <input type="checkbox" checked> Remember me
+                    </label>
+                    <a href="#" class="text-xs text-gray-400 hover:text-brand-blue transition-colors font-medium">Forgot password?</a>
                 </div>
-                <button type="submit" class="w-full bg-white text-brand-900 py-4 rounded-xl uppercase tracking-widest text-xs font-bold hover:bg-brand-50 transition shadow-lg mt-4 flex items-center justify-center gap-2">
-                    Buka Dashboard <i class="fa-solid fa-arrow-right"></i>
+
+                <!-- White Login Button -->
+                <button type="submit" class="w-full bg-white text-brand-blue py-3.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] border border-gray-50 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] transition-all mt-2">
+                    Masuk Belanja
+                </button>
+
+                <!-- Blue Sign Up Button -->
+                <div class="text-center mt-10">
+                    <p class="text-[11px] text-gray-400 font-medium mb-3">Belum punya akun AROS?</p>
+                    <button type="button" class="w-full bg-[#3b82f6] text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-colors">
+                        Daftar Akun Baru
+                    </button>
+                </div>
+            </form>
+
+
+            <!-- FORM 2: ADMIN LOGIN (Hidden by Default) -->
+            <form id="admin-form" onsubmit="handleAdminLogin(event)" class="space-y-4 fade-in hidden-form">
+                <!-- Input Box 1 -->
+                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
+                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">ID Admin Akses</label>
+                    <input type="text" id="admin-id" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="Contoh: ADM-001" required>
+                </div>
+                
+                <!-- Input Box 2 -->
+                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
+                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Security Code / Password</label>
+                    <input type="password" id="admin-pass" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="••••••••" required>
+                </div>
+
+                <!-- Checkbox -->
+                <div class="flex items-center px-2 py-2">
+                    <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer font-medium">
+                        <input type="checkbox"> Simpan sesi login ini
+                    </label>
+                </div>
+
+                <!-- White Login Button -->
+                <button type="submit" class="w-full bg-white text-brand-dark py-3.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] border border-gray-50 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] transition-all mt-2 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lock text-xs"></i> Masuk Dashboard
                 </button>
             </form>
-        </div>
 
+        </div>
     </div>
 
     <script>
+        let isCustomerView = true;
+
+        // Fungsi untuk men-switch / ganti tampilan form di sebelah kanan
+        function toggleView() {
+            const custForm = document.getElementById('customer-form');
+            const adminForm = document.getElementById('admin-form');
+            const title = document.getElementById('welcome-title');
+            const desc = document.getElementById('welcome-desc');
+            const btn = document.getElementById('toggle-btn');
+
+            if (isCustomerView) {
+                // Pindah ke Admin View
+                custForm.classList.add('hidden-form');
+                adminForm.classList.remove('hidden-form');
+                
+                title.innerHTML = 'Admin<br>Portal!';
+                desc.innerText = 'Gunakan ID dan Password khusus untuk masuk ke sistem manajemen AROS.';
+                btn.innerText = 'Masuk sebagai Customer';
+            } else {
+                // Pindah ke Customer View
+                adminForm.classList.add('hidden-form');
+                custForm.classList.remove('hidden-form');
+                
+                title.innerHTML = 'Hello,<br>welcome!';
+                desc.innerText = 'Platform sepatu olahraga performa tinggi. Silakan masuk untuk mulai mengeksplorasi produk kami.';
+                btn.innerText = 'Masuk sebagai Admin';
+            }
+            
+            // Re-trigger animasi
+            const activeForm = isCustomerView ? adminForm : custForm;
+            activeForm.classList.remove('fade-in');
+            void activeForm.offsetWidth; // trigger reflow
+            activeForm.classList.add('fade-in');
+
+            isCustomerView = !isCustomerView;
+        }
+
+        // Logic Submit Form Customer
         function handleCustomerLogin(e) {
             e.preventDefault();
             const name = document.getElementById('cust-name').value.trim();
@@ -102,7 +185,6 @@
             if(name !== '' && pass !== '') {
                 localStorage.setItem('aros_current_customer', name);
                 
-                // Sinkronisasi history akun customer
                 let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
                 if(!customers.some(c => c.name === name)) {
                     customers.push({ 
@@ -116,6 +198,7 @@
             }
         }
 
+        // Logic Submit Form Admin
         function handleAdminLogin(e) {
             e.preventDefault();
             const adminId = document.getElementById('admin-id').value.trim();
