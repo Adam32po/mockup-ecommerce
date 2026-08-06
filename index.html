@@ -135,7 +135,6 @@
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toast-icon');
             
-            // Set Color based on type
             if(type === 'error') {
                 toast.className = "fixed top-5 right-5 bg-brand-red text-white px-6 py-3 rounded-xl shadow-lg transform -translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm";
                 icon.className = "fa-solid fa-circle-exclamation";
@@ -159,7 +158,6 @@
             const btn = document.getElementById('toggle-btn');
 
             if (isCustomerView) {
-                // Switch TO Admin
                 custLoginForm.classList.add('hidden-form');
                 custRegForm.classList.add('hidden-form');
                 adminForm.classList.remove('hidden-form');
@@ -167,7 +165,6 @@
                 desc.innerText = 'Gunakan ID dan Password khusus untuk masuk ke sistem manajemen operasional AROS.';
                 btn.innerText = 'Masuk sebagai Customer';
             } else {
-                // Switch TO Customer
                 adminForm.classList.add('hidden-form');
                 custLoginForm.classList.remove('hidden-form');
                 title.innerHTML = 'Hello,<br>welcome!';
@@ -201,32 +198,31 @@
 
             let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
             
-            // CEK VALIDASI: Apakah Nickname atau Email sudah terdaftar?
             const isExist = customers.some(c => c.nickname === nick || c.email === email);
             
             if(isExist) {
                 showToast('Gagal! Nickname atau Email sudah terdaftar.', 'error');
             } else {
-                // Jika belum ada, simpan data baru
-                customers.push({
+                const newCustomer = {
                     fullName: fullName,
                     nickname: nick,
                     email: email,
-                    password: pass, // Dummy save (In real world, must be encrypted)
+                    password: pass,
                     dateJoin: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}),
                     status: 'Aktif'
-                });
+                };
+
+                customers.push(newCustomer);
                 localStorage.setItem('aros_customers', JSON.stringify(customers));
                 
                 showToast('Pendaftaran Berhasil! Silakan Login.', 'success');
-                e.target.reset(); // Kosongkan form
+                e.target.reset();
                 
-                // Kembali ke halaman login setelah 1 detik
                 setTimeout(() => { switchCustomerForm('login'); }, 1500);
             }
         }
 
-        // Handle Customer Login
+        // Handle Customer Login (Otomatis set sesi user aktif ke customer.html)
         function handleCustomerLogin(e) {
             e.preventDefault();
             const nick = document.getElementById('login-nick').value.trim();
@@ -235,10 +231,17 @@
             let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
             const user = customers.find(c => c.nickname === nick && c.password === pass);
 
-            // Validasi Login (Harus daftar dulu)
             if(user) {
+                // Simpan data sesi aktif agar langsung dikenali di customer.html
                 localStorage.setItem('aros_current_customer', user.nickname);
-                window.location.href = 'customer.html';
+                localStorage.setItem('aros_active_user', user.nickname);
+                localStorage.setItem('aros_active_email', user.email || '');
+                localStorage.setItem('aros_active_phone', user.phone || '-');
+
+                showToast('Login Berhasil! Mengalihkan...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'customer.html';
+                }, 800);
             } else {
                 showToast('Nickname atau Password salah / belum terdaftar!', 'error');
             }
