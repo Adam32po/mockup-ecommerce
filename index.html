@@ -3,417 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AeroSport - Toko Peralatan Olahraga</title>
-    <!-- Menggunakan font Poppins dari Google Fonts untuk kesan modern & estetik -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>AROS - Secure Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' } }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        /* CSS Variabel & Reset */
-        :root {
-            --primary: #FF5722; /* Oranye Neon / Energik */
-            --dark: #121212;
-            --light: #F8F9FA;
-            --gray: #888888;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: var(--light);
-            color: var(--dark);
-        }
-
-        /* Navigasi / Header */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 5%;
-            background: #ffffff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            text-decoration: none;
-            color: var(--dark);
-            letter-spacing: -1px;
-        }
-
-        .logo span {
-            color: var(--primary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .cart-btn {
-            background: var(--dark);
-            color: #ffffff;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .cart-btn:hover {
-            background: var(--primary);
-            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
-        }
-
-        /* Bagian Hero (Spanduk Utama) */
-        .hero {
-            height: 80vh;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
-                        url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1600&q=80') center/cover;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #ffffff;
-            padding: 0 20px;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            line-height: 1.1;
-        }
-
-        .hero h1 span {
-            color: var(--primary);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 35px;
-            font-weight: 300;
-            max-width: 600px;
-            color: #E0E0E0;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: #ffffff;
-            padding: 16px 40px;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(255, 87, 34, 0.4);
-        }
-
-        /* Bagian Produk */
-        .products-section {
-            padding: 80px 5%;
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.2rem;
-            margin-bottom: 60px;
-            position: relative;
-            color: var(--dark);
-        }
-
-        .section-title::after {
-            content: '';
-            width: 80px;
-            height: 4px;
-            background: var(--primary);
-            display: block;
-            margin: 15px auto 0;
-            border-radius: 2px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-
-        /* Kartu Produk yang Estetik */
-        .card {
-            background: #ffffff;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-            transition: all 0.4s ease;
-            position: relative;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-        }
-
-        .card-img-wrapper {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card img {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .card:hover img {
-            transform: scale(1.05);
-        }
-
-        .badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: var(--dark);
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            z-index: 2;
-        }
-
-        .card-content {
-            padding: 25px;
-        }
-
-        .category {
-            font-size: 0.8rem;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            margin: 8px 0 15px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .add-btn {
-            background: var(--dark);
-            color: #fff;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .add-btn:hover {
-            background: var(--primary);
-            transform: rotate(90deg);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: #ffffff;
-            text-align: center;
-            padding: 40px 20px;
-            margin-top: 50px;
-        }
-
-        footer p {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        /* Responsivitas untuk mobile */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none; /* Disembunyikan di mobile untuk simplicity di mockup ini */
-            }
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-        }
+        .input-minimal { width: 100%; border: none; border-bottom: 1px solid #bae6fd; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #0c4a6e; }
+        .input-minimal:focus { border-bottom-color: #0284c7; }
+        .input-dark-minimal { width: 100%; border: none; border-bottom: 1px solid #0369a1; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #ffffff; }
+        .input-dark-minimal:focus { border-bottom-color: #ffffff; }
+        .fade-in { animation: fadeIn 0.6s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="font-sans bg-brand-50 text-brand-900 antialiased min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
-    <!-- Navigasi -->
-    <nav>
-        <a href="#" class="logo">Aero<span>Sport</span></a>
-        <ul class="nav-links">
-            <li><a href="#">Beranda</a></li>
-            <li><a href="#produk">Koleksi</a></li>
-            <li><a href="#">Pria</a></li>
-            <li><a href="#">Wanita</a></li>
-        </ul>
-        <button class="cart-btn" onclick="openCart()">
-            🛒 <span id="cart-count">0</span> Item
-        </button>
-    </nav>
+    <!-- Background Estetik -->
+    <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=2000&q=80" alt="AROS Background" class="w-full h-full object-cover opacity-20 grayscale">
+        <div class="absolute inset-0 bg-gradient-to-tr from-brand-900/60 to-brand-500/20"></div>
+    </div>
 
-    <!-- Bagian Hero -->
-    <header class="hero">
-        <h1>Tembus <span>Batasmu</span></h1>
-        <p>Temukan peralatan olahraga premium yang dirancang khusus untuk meningkatkan performa dan gaya Anda di setiap gerakan.</p>
-        <a href="#produk" class="btn-primary">Belanja Sekarang</a>
-    </header>
-
-    <!-- Bagian Produk -->
-    <section id="produk" class="products-section">
-        <h2 class="section-title">Koleksi Terbaru</h2>
+    <!-- Dual Login Card Portal -->
+    <div class="w-full max-w-4xl bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row fade-in relative z-10 border border-white/50">
         
-        <div class="grid">
-            <!-- Produk 1 -->
-            <div class="card">
-                <div class="card-img-wrapper">
-                    <span class="badge">BARU</span>
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Sepatu Lari Merah">
+        <!-- Customer Portal -->
+        <div class="w-full md:w-1/2 p-10 md:p-14 border-b md:border-b-0 md:border-r border-brand-100 flex flex-col justify-center">
+            <div class="text-center mb-8">
+                <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
+                    <i class="fa-solid fa-bag-shopping text-xl"></i>
                 </div>
-                <div class="card-content">
-                    <p class="category">Sepatu Lari</p>
-                    <h3 class="card-title">Aero Velocity X</h3>
-                    <div class="price-row">
-                        <span class="price">Rp 1.299.000</span>
-                        <button class="add-btn" onclick="addToCart('Aero Velocity X')" title="Tambah ke Keranjang">+</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Produk 2 -->
-            <div class="card">
-                <div class="card-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=600&q=80" alt="Dumbbell Besi">
-                </div>
-                <div class="card-content">
-                    <p class="category">Peralatan Gym</p>
-                    <h3 class="card-title">IronCore Dumbbell 10kg</h3>
-                    <div class="price-row">
-                        <span class="price">Rp 450.000</span>
-                        <button class="add-btn" onclick="addToCart('IronCore Dumbbell')" title="Tambah ke Keranjang">+</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Produk 3 -->
-            <div class="card">
-                <div class="card-img-wrapper">
-                    <span class="badge" style="background: var(--primary);">PROMO</span>
-                    <img src="https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=600&q=80" alt="Bola Basket">
-                </div>
-                <div class="card-content">
-                    <p class="category">Olahraga Bola</p>
-                    <h3 class="card-title">ProGrip Basketball</h3>
-                    <div class="price-row">
-                        <span class="price">Rp 780.000</span>
-                        <button class="add-btn" onclick="addToCart('ProGrip Basketball')" title="Tambah ke Keranjang">+</button>
-                    </div>
-                </div>
+                <h2 class="text-2xl font-bold tracking-tight text-brand-900">Customer Access</h2>
+                <p class="text-xs uppercase tracking-widest text-brand-500 mt-1">Belanja & Eksplorasi Produk</p>
             </div>
             
-            <!-- Produk 4 -->
-            <div class="card">
-                <div class="card-img-wrapper">
-                    <img src="https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=600&q=80" alt="Matras Yoga">
+            <form onsubmit="handleCustomerLogin(event)" class="space-y-5">
+                <div>
+                    <label class="text-[11px] uppercase tracking-widest text-brand-500 font-semibold">Nickname / Nama</label>
+                    <input type="text" id="cust-name" class="input-minimal" placeholder="Contoh: AlexRider" required>
                 </div>
-                <div class="card-content">
-                    <p class="category">Yoga & Pilates</p>
-                    <h3 class="card-title">ZenFlow Yoga Mat</h3>
-                    <div class="price-row">
-                        <span class="price">Rp 320.000</span>
-                        <button class="add-btn" onclick="addToCart('ZenFlow Yoga Mat')" title="Tambah ke Keranjang">+</button>
-                    </div>
+                <div>
+                    <label class="text-[11px] uppercase tracking-widest text-brand-500 font-semibold">Password Keamanan</label>
+                    <input type="password" id="cust-pass" class="input-minimal" placeholder="••••••••" required>
                 </div>
-            </div>
+                <button type="submit" class="w-full bg-brand-600 text-white py-4 rounded-xl uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30 mt-4 flex items-center justify-center gap-2">
+                    Masuk Belanja <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer>
-        <h2 class="logo" style="color: white; margin-bottom: 10px;">Aero<span style="color: var(--primary);">Sport</span></h2>
-        <p>&copy; 2026 AeroSport Indonesia. Mockup Desain Sederhana.</p>
-    </footer>
-
-    <!-- JavaScript Sederhana untuk Interaksi -->
-    <script>
-        let cartCount = 0;
-
-        function addToCart(productName) {
-            cartCount++;
-            document.getElementById('cart-count').innerText = cartCount;
+        <!-- Admin Portal -->
+        <div class="w-full md:w-1/2 p-10 md:p-14 bg-brand-900 text-white flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand-700 rounded-full blur-3xl opacity-50"></div>
             
-            // Animasi kecil pada tombol keranjang
-            const cartBtn = document.querySelector('.cart-btn');
-            cartBtn.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                cartBtn.style.transform = 'scale(1)';
-            }, 200);
+            <div class="text-center mb-8 relative z-10">
+                <div class="w-12 h-12 bg-brand-800 text-brand-100 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight">Admin Workspace</h2>
+                <p class="text-xs uppercase tracking-widest text-brand-200 mt-1">Manajemen & Laporan Toko</p>
+            </div>
+            
+            <form onsubmit="handleAdminLogin(event)" class="space-y-5 relative z-10">
+                <div>
+                    <label class="text-[11px] uppercase tracking-widest text-brand-200 font-semibold">ID Admin / Nickname</label>
+                    <input type="text" id="admin-id" class="input-dark-minimal" placeholder="Contoh: ADM-001" required>
+                </div>
+                <div>
+                    <label class="text-[11px] uppercase tracking-widest text-brand-200 font-semibold">Password Akses</label>
+                    <input type="password" id="admin-pass" class="input-dark-minimal" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full bg-white text-brand-900 py-4 rounded-xl uppercase tracking-widest text-xs font-bold hover:bg-brand-50 transition shadow-lg mt-4 flex items-center justify-center gap-2">
+                    Buka Dashboard <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
 
-            // Notifikasi sederhana
-            alert(productName + " berhasil ditambahkan ke keranjang!");
+    </div>
+
+    <script>
+        function handleCustomerLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('cust-name').value.trim();
+            const pass = document.getElementById('cust-pass').value.trim();
+
+            if(name !== '' && pass !== '') {
+                localStorage.setItem('aros_current_customer', name);
+                
+                // Sinkronisasi history akun customer
+                let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+                if(!customers.some(c => c.name === name)) {
+                    customers.push({ 
+                        name: name, 
+                        date: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}), 
+                        status: 'Aktif' 
+                    });
+                    localStorage.setItem('aros_customers', JSON.stringify(customers));
+                }
+                window.location.href = 'customer.html';
+            }
         }
 
-        function openCart() {
-            if(cartCount === 0) {
-                alert("Keranjang belanja Anda masih kosong.");
-            } else {
-                alert("Anda memiliki " + cartCount + " item di keranjang. (Fitur checkout belum tersedia di mockup ini)");
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const adminId = document.getElementById('admin-id').value.trim();
+            const adminPass = document.getElementById('admin-pass').value.trim();
+
+            if(adminId !== '' && adminPass !== '') {
+                localStorage.setItem('aros_current_admin', adminId);
+                window.location.href = 'admin.html';
             }
         }
     </script>
