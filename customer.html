@@ -54,7 +54,8 @@
             </nav>
             
             <div class="flex items-center gap-6 text-xl text-brand-700">
-                <button class="hover:text-brand-500 transition"><i class="fa-solid fa-search"></i></button>
+                <!-- Tombol Search Interaktif -->
+                <button class="hover:text-brand-500 transition cursor-pointer" onclick="openSearchModal()" title="Cari Produk"><i class="fa-solid fa-search"></i></button>
                 <button class="relative hover:text-brand-500 transition" onclick="toggleCart()">
                     <i class="fa-solid fa-shopping-bag"></i>
                     <span id="cart-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden border-2 border-white shadow-sm">0</span>
@@ -117,6 +118,24 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal Search Interaktif -->
+    <div id="modal-search" class="fixed inset-0 z-50 hidden items-start justify-center pt-24 px-4">
+        <div class="absolute inset-0 bg-brand-900/60 backdrop-blur-md" onclick="closeSearchModal()"></div>
+        <div class="relative bg-white w-full max-w-2xl p-6 rounded-3xl shadow-2xl fade-in border border-brand-100">
+            <div class="flex items-center justify-between border-b border-brand-100 pb-4 mb-4">
+                <h3 class="text-lg font-bold text-brand-900 flex items-center gap-2"><i class="fa-solid fa-search text-brand-600"></i> Cari Produk AROS</h3>
+                <button onclick="closeSearchModal()" class="text-brand-400 hover:text-brand-600 text-xl"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="relative">
+                <input type="text" id="search-input" oninput="handleLiveSearch(event)" class="w-full bg-brand-50 border-2 border-brand-100 focus:border-brand-600 rounded-2xl px-5 py-4 text-brand-900 outline-none transition font-medium placeholder-brand-400" placeholder="Ketik nama atau kode sepatu (contoh: Sprint, AR-001)..." autofocus>
+            </div>
+            <!-- Hasil Pencarian Live -->
+            <div id="search-suggestions" class="mt-4 max-h-72 overflow-y-auto space-y-2">
+                <!-- Diisi via JS -->
+            </div>
+        </div>
+    </div>
 
     <footer class="bg-white border-t border-brand-100 mt-auto">
         <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
@@ -197,6 +216,63 @@
         };
 
         const toggleMobileMenu = () => document.getElementById('mobile-menu').classList.toggle('hidden');
+
+        // Logic Modal Search
+        const openSearchModal = () => {
+            const modal = document.getElementById('modal-search');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('search-input').value = '';
+            renderSearchSuggestions('');
+            setTimeout(() => document.getElementById('search-input').focus(), 100);
+        };
+
+        const closeSearchModal = () => {
+            const modal = document.getElementById('modal-search');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        const handleLiveSearch = (e) => {
+            const keyword = e.target.value.trim();
+            renderSearchSuggestions(keyword);
+        };
+
+        const renderSearchSuggestions = (keyword) => {
+            const products = getProducts();
+            const container = document.getElementById('search-suggestions');
+            container.innerHTML = '';
+
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(keyword.toLowerCase()) || 
+                p.code.toLowerCase().includes(keyword.toLowerCase())
+            );
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<p class="text-center text-brand-400 py-6 text-sm">Tidak ada produk yang cocok dengan "${keyword}"</p>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 rounded-2xl hover:bg-brand-50 cursor-pointer transition border border-transparent hover:border-brand-100';
+                div.onclick = () => {
+                    closeSearchModal();
+                    openProductDetail(p.id);
+                };
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${p.imageUrl}" class="w-12 h-12 rounded-xl object-cover bg-brand-50 border border-brand-100 p-1">
+                        <div>
+                            <h5 class="text-sm font-bold text-brand-900">${p.name}</h5>
+                            <p class="text-xs text-brand-500 font-mono">${p.code}</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-bold text-brand-600">${formatRupiah(p.price)}</span>
+                `;
+                container.appendChild(div);
+            });
+        };
 
         const renderCustomerCatalog = () => {
             const products = getProducts();
@@ -374,12 +450,16 @@
             let total = cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
             let itemsSummary = cart.map(i => ({ name: i.product.name, qty: i.qty }));
 
-            // Simpan pesanan ke LocalStorage agar masuk ke laporan Admin
             let orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
             orders.push({ name, phone, address, items: itemsSummary, total, date: new Date().toLocaleDateString() });
             localStorage.setItem('aros_orders', JSON.stringify(orders));
 
-            // Update stok produk terjual
+            let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+            if(!customers.some(c => c.name === name)) {
+                customers.push({ name: name, date: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}), status: 'Aktif' });
+                localStorage.setItem('aros_customers', JSON.stringify(customers));
+            }
+
             let products = JSON.parse(localStorage.getItem('aros_products')) || [];
             cart.forEach(cartItem => {
                 let p = products.find(prod => prod.id === cartItem.product.id);
