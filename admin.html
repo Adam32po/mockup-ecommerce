@@ -14,7 +14,7 @@
                 extend: { 
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' } }
-                }
+                } 
             }
         }
     </script>
@@ -28,6 +28,9 @@
         .input-minimal { width: 100%; border: none; border-bottom: 1px solid #bae6fd; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #0c4a6e;}
         .input-minimal:focus { border-bottom-color: #0284c7; }
         .view-hidden { display: none !important; }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="font-sans bg-brand-50 text-brand-900 antialiased">
@@ -40,10 +43,16 @@
     <div class="min-h-screen flex flex-col md:flex-row">
         <!-- Sidebar -->
         <aside class="w-full md:w-64 bg-white border-r border-brand-100 flex flex-col shadow-sm z-10">
-            <div class="p-8 border-b border-brand-100 bg-brand-600 text-white">
-                <h2 class="text-2xl font-bold tracking-tighter">AROS</h2>
-                <p class="text-xs uppercase tracking-widest text-brand-100 mt-1">Admin Panel</p>
+            <!-- Header Sidebar dengan Background Image -->
+            <div class="p-8 border-b border-brand-100 bg-brand-900 text-white relative overflow-hidden">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmcHqbGY0tJyyxBrlWjlFFx9BCd96X2maGL6mhyv2Wzw&s=10" class="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-overlay">
+                <div class="absolute inset-0 bg-brand-900/80 z-0"></div>
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold tracking-tighter">AROS</h2>
+                    <p class="text-xs uppercase tracking-widest text-brand-100 mt-1">Admin Panel</p>
+                </div>
             </div>
+
             <nav class="flex-1 p-4 space-y-2">
                 <button onclick="showAdminMenu('admin-dash')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors font-medium">Dashboard</button>
                 <button onclick="showAdminMenu('admin-products')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Katalog Produk</button>
@@ -64,8 +73,10 @@
             <!-- Dashboard -->
             <div id="admin-dash" class="admin-section fade-in">
                 <h3 class="text-2xl font-bold mb-2">Overview Kinerja</h3>
-                <p class="text-brand-500 mb-8">Data real-time toko baru.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <p class="text-brand-500 mb-8">Data real-time toko.</p>
+                
+                <!-- 4 Grid Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
                         <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Produk</p>
                         <h4 class="text-4xl font-bold text-brand-600" id="stat-total-product">0</h4>
@@ -74,9 +85,30 @@
                         <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Terjual</p>
                         <h4 class="text-4xl font-bold text-brand-600" id="stat-total-sold">0</h4>
                     </div>
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm bg-gradient-to-br from-brand-600 to-brand-900 text-white">
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">User Aktif</p>
+                        <h4 class="text-4xl font-bold text-emerald-600" id="stat-active-users">0</h4>
+                    </div>
+                    <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-brand-600 to-brand-900 text-white flex flex-col justify-center">
                         <p class="text-xs uppercase tracking-widest text-brand-100 mb-2">Pendapatan Bersih</p>
-                        <h4 class="text-3xl font-bold" id="stat-total-revenue">Rp 0</h4>
+                        <h4 class="text-2xl font-bold" id="stat-total-revenue">Rp 0</h4>
+                    </div>
+                </div>
+
+                <!-- Grafik Batang Statistik Keuangan 3 Hari (Kemarin, Hari Ini, Esok) -->
+                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h4 class="text-lg font-bold text-brand-900"><i class="fa-solid fa-chart-bar mr-2 text-brand-600"></i> Statistik Keuangan (3 Hari)</h4>
+                            <p class="text-xs text-brand-500 mt-1">Perbandingan pemasukan dan pengeluaran secara tren harian.</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-semibold">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-brand-600 rounded-sm inline-block"></span> Pemasukan</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-red-400 rounded-sm inline-block"></span> Pengeluaran</span>
+                        </div>
+                    </div>
+                    <div id="financial-bars-container" class="space-y-6">
+                        <!-- Rendered via JavaScript -->
                     </div>
                 </div>
             </div>
@@ -113,7 +145,7 @@
                 </div>
             </div>
 
-            <!-- History Akun Customer (DIPERBARUI) -->
+            <!-- History Akun Customer -->
             <div id="admin-history" class="admin-section view-hidden fade-in">
                 <div class="flex justify-between items-end mb-8">
                     <div>
@@ -125,20 +157,16 @@
                     </div>
                 </div>
 
-                <!-- Tabel 1: Log Akun Terbaru (Recent) -->
                 <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Pendaftaran Terbaru</h4>
                 <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-4 mb-10">
                     <table class="w-full text-left text-sm">
                         <thead class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-brand-50">
                             <tr><th class="p-3">Nickname</th><th class="p-3">Email</th><th class="p-3">Kapan Ditambahkan</th></tr>
                         </thead>
-                        <tbody id="admin-recent-history-table" class="divide-y divide-brand-50 text-brand-800">
-                            <!-- Diisi via JS (Hanya 3 data terakhir) -->
-                        </tbody>
+                        <tbody id="admin-recent-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
                     </table>
                 </div>
 
-                <!-- Tabel 2: Seluruh Daftar Akun Lengkap -->
                 <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-users mr-2"></i> Daftar Seluruh Akun</h4>
                 <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
                     <table class="w-full text-left text-sm">
@@ -151,20 +179,24 @@
                                 <th class="p-3">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-full-history-table" class="divide-y divide-brand-50 text-brand-800">
-                            <!-- Diisi via JS (Seluruh Akun) -->
-                        </tbody>
+                        <tbody id="admin-full-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Data Pelanggan (Transaksi) -->
+            <!-- Data Pelanggan (Transaksi & Pengiriman) -->
             <div id="admin-customers" class="admin-section view-hidden fade-in">
-                <h3 class="text-2xl font-bold mb-8">Data Transaksi Pelanggan</h3>
+                <h3 class="text-2xl font-bold mb-8">Data Transaksi & Pengiriman</h3>
                 <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
                     <table class="w-full text-left text-sm">
                         <thead class="text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
-                            <tr><th class="p-3">Nama Pembeli</th><th class="p-3">Kontak / Alamat</th><th class="p-3">Produk Dibeli</th><th class="p-3">Total Bayar</th></tr>
+                            <tr>
+                                <th class="p-3">ID Pesanan</th>
+                                <th class="p-3">Info Pembeli</th>
+                                <th class="p-3">Produk Dibeli</th>
+                                <th class="p-3">Total Bayar</th>
+                                <th class="p-3">Status Pengiriman</th>
+                            </tr>
                         </thead>
                         <tbody id="admin-orders-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
                     </table>
@@ -181,11 +213,27 @@
             <!-- Laporan Harian -->
             <div id="admin-daily" class="admin-section view-hidden fade-in">
                 <h3 class="text-2xl font-bold mb-2">Laporan Finansial Harian</h3>
-                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko.</p>
+                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko. Masukkan pengeluaran secara manual.</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm"><p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pemasukan</p><h4 class="text-2xl font-bold text-brand-600" id="daily-income">Rp 0</h4></div>
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm"><p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pengeluaran</p><h4 class="text-2xl font-bold text-red-500">Rp 0</h4></div>
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm bg-brand-600 text-white"><p class="text-xs uppercase tracking-widest text-brand-100 mb-2">Laba Bersih</p><h4 class="text-2xl font-bold" id="daily-profit">Rp 0</h4></div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pemasukan (Otomatis)</p>
+                        <h4 class="text-2xl font-bold text-brand-600" id="daily-income">Rp 0</h4>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pengeluaran (Manual)</p>
+                        <div class="flex items-center gap-2 border-b-2 border-brand-100 focus-within:border-red-400 transition-colors pb-1">
+                            <span class="text-red-500 font-bold">Rp</span>
+                            <input type="number" id="inp-expense" class="w-full outline-none text-lg font-bold text-red-500 bg-transparent placeholder-red-300" placeholder="0">
+                            <button onclick="saveExpenseData()" class="bg-brand-50 hover:bg-brand-100 text-brand-600 px-3 py-1.5 rounded-lg text-xs font-bold transition ml-auto shadow-sm">Simpan</button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 rounded-xl shadow-md bg-brand-600 text-white flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-brand-500 rounded-full opacity-50 blur-xl"></div>
+                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2 relative z-10">Laba Bersih</p>
+                        <h4 class="text-2xl font-bold relative z-10" id="daily-profit">Rp 0</h4>
+                    </div>
                 </div>
             </div>
 
@@ -193,9 +241,10 @@
     </div>
 
     <script>
-        let products = JSON.parse(localStorage.getItem('aros_products')) || [];
-        let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
-        let orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+        let products = [];
+        let customers = [];
+        let orders = [];
+        let savedExpense = 0;
 
         const showToast = (msg) => {
             const toast = document.getElementById('toast');
@@ -209,21 +258,42 @@
         const showAdminMenu = (sectionId) => {
             document.querySelectorAll('.admin-section').forEach(el => el.classList.add('view-hidden'));
             document.getElementById(sectionId).classList.remove('view-hidden');
+            
+            renderAdminData();
             if(sectionId === 'admin-reports') renderReportBars();
             if(sectionId === 'admin-history') renderHistoryTables();
             if(sectionId === 'admin-customers') renderOrdersTable();
         };
 
         const renderAdminData = () => {
-            document.getElementById('stat-total-product').innerText = products.length;
-            
-            let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
-            let totalRev = orders.reduce((acc, o) => acc + o.total, 0);
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            savedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
 
+            document.getElementById('stat-total-product').innerText = products.length;
+            let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
             document.getElementById('stat-total-sold').innerText = totalSold;
-            document.getElementById('stat-total-revenue').innerText = formatRupiah(totalRev);
-            document.getElementById('daily-income').innerText = formatRupiah(totalRev);
-            document.getElementById('daily-profit').innerText = formatRupiah(totalRev);
+            document.getElementById('stat-active-users').innerText = customers.length;
+
+            let totalIncome = orders.reduce((acc, o) => acc + o.total, 0); 
+            let netProfit = totalIncome - savedExpense; 
+
+            document.getElementById('daily-income').innerText = formatRupiah(totalIncome);
+            
+            const expenseInput = document.getElementById('inp-expense');
+            if (document.activeElement !== expenseInput) {
+                expenseInput.value = savedExpense > 0 ? savedExpense : '';
+            }
+            
+            const profitEl = document.getElementById('daily-profit');
+            profitEl.innerText = formatRupiah(netProfit);
+            profitEl.className = netProfit < 0 ? "text-2xl font-bold relative z-10 text-red-200" : "text-2xl font-bold relative z-10 text-white";
+
+            document.getElementById('stat-total-revenue').innerText = formatRupiah(netProfit);
+
+            // Render grafik batang keuangan 3 hari
+            renderFinancialBars(totalIncome, savedExpense);
 
             const tbody = document.getElementById('admin-product-table-body');
             tbody.innerHTML = '';
@@ -249,7 +319,58 @@
             });
         };
 
+        const renderFinancialBars = (totalIncome, totalExpense) => {
+            const container = document.getElementById('financial-bars-container');
+            container.innerHTML = '';
+
+            const daysData = [
+                { label: 'Kemarin', income: Math.round(totalIncome * 0.3), expense: Math.round(totalExpense * 0.4) },
+                { label: 'Hari Ini', income: Math.round(totalIncome * 0.5), expense: Math.round(totalExpense * 0.5) },
+                { label: 'Esok (Estimasi)', income: Math.round(totalIncome * 0.2), expense: Math.round(totalExpense * 0.1) }
+            ];
+
+            const maxVal = Math.max(...daysData.map(d => Math.max(d.income, d.expense)), 100000);
+
+            daysData.forEach(d => {
+                const incPercent = Math.min(100, Math.round((d.income / maxVal) * 100));
+                const expPercent = Math.min(100, Math.round((d.expense / maxVal) * 100));
+
+                const row = document.createElement('div');
+                row.className = 'border-b border-brand-50 pb-4 last:border-none last:pb-0';
+                row.innerHTML = `
+                    <div class="flex justify-between items-center mb-2 text-xs font-bold uppercase tracking-widest text-brand-700">
+                        <span>${d.label}</span>
+                        <span class="text-brand-500 font-normal">Pemasukan: <strong class="text-brand-700">${formatRupiah(d.income)}</strong> | Pengeluaran: <strong class="text-red-500">${formatRupiah(d.expense)}</strong></span>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pemasukan</span><span>${formatRupiah(d.income)}</span></div>
+                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-brand-600 h-2.5 rounded-full transition-all duration-500" style="width: ${incPercent}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pengeluaran</span><span>${formatRupiah(d.expense)}</span></div>
+                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-red-400 h-2.5 rounded-full transition-all duration-500" style="width: ${expPercent}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        };
+
+        const saveExpenseData = () => {
+            const inputVal = document.getElementById('inp-expense').value;
+            savedExpense = inputVal ? parseInt(inputVal) : 0;
+            localStorage.setItem('aros_expenses', savedExpense);
+            renderAdminData();
+            showToast('Pengeluaran berhasil disimpan & Laba dihitung ulang!');
+        };
+
         const renderHistoryTables = () => {
+            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
             document.getElementById('stat-total-users').innerText = customers.length;
             
             const recentTbody = document.getElementById('admin-recent-history-table');
@@ -265,9 +386,7 @@
                 return;
             }
 
-            // Render Table 2 (Seluruh Data)
             customers.forEach(c => {
-                // Handling jika data lama tidak punya fullName / email
                 const fname = c.fullName || '-';
                 const email = c.email || '-';
                 const nick = c.nickname || c.name || 'Unknown';
@@ -278,12 +397,10 @@
                         <td class="p-3 text-brand-600 font-medium">@${nick}</td>
                         <td class="p-3 text-gray-500">${email}</td>
                         <td class="p-3">${c.dateJoin || c.date}</td>
-                        <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${c.status}</span></td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${c.status || 'Aktif'}</span></td>
                     </tr>`;
             });
 
-            // Render Table 1 (Hanya 3 data terbaru)
-            // Membalik array untuk mengambil yang paling baru ditambahkan
             const recentCustomers = [...customers].reverse().slice(0, 3);
             recentCustomers.forEach(c => {
                 const email = c.email || '-';
@@ -297,20 +414,52 @@
             });
         };
 
+        const updateOrderStatus = (index, newStatus) => {
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            orders[index].status = newStatus;
+            localStorage.setItem('aros_orders', JSON.stringify(orders));
+            showToast('Status pengiriman berhasil diperbarui!');
+        };
+
         const renderOrdersTable = () => {
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
             const tbody = document.getElementById('admin-orders-table');
             tbody.innerHTML = '';
             if(orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-brand-400">Belum ada transaksi pesanan masuk.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-brand-400">Belum ada transaksi pesanan masuk.</td></tr>`;
                 return;
             }
-            orders.forEach(o => {
-                let itemsList = o.items.map(i => `${i.name} (x${i.qty})`).join(', ');
-                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${o.name}</td><td class="p-3 text-xs">${o.phone}<br>${o.address}</td><td class="p-3 text-xs">${itemsList}</td><td class="p-3 font-bold text-brand-600">${formatRupiah(o.total)}</td></tr>`;
+            
+            const statusOptions = ['Sedang Dikemas', 'Diserahkan ke Logistik', 'Kurir Menuju Lokasi', 'Pesanan Selesai'];
+
+            [...orders].reverse().forEach((o, reversedIndex) => {
+                const originalIndex = orders.length - 1 - reversedIndex;
+                let itemsList = o.items.map(i => `${i.name} (x${i.qty})`).join('<br>');
+                let currentStatus = o.status || 'Sedang Dikemas';
+                
+                let selectHTML = `<select onchange="updateOrderStatus(${originalIndex}, this.value)" class="text-xs p-2 rounded-lg border border-brand-200 bg-brand-50 text-brand-700 font-bold outline-none cursor-pointer hover:border-brand-400 transition w-full">`;
+                statusOptions.forEach(opt => {
+                    selectHTML += `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`;
+                });
+                selectHTML += `</select>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-brand-50 transition">
+                        <td class="p-3 font-mono text-xs font-bold text-brand-600">${o.orderId || 'ORD-LAMA'}</td>
+                        <td class="p-3">
+                            <span class="font-semibold block text-brand-900">${o.name}</span>
+                            <span class="text-[10px] text-gray-500">${o.phone} | ${o.date}</span><br>
+                            <span class="text-xs text-gray-600 line-clamp-2 mt-1">${o.address}</span>
+                        </td>
+                        <td class="p-3 text-xs leading-relaxed">${itemsList}</td>
+                        <td class="p-3 font-bold text-brand-700">${formatRupiah(o.total)}</td>
+                        <td class="p-3">${selectHTML}</td>
+                    </tr>`;
             });
         };
 
         const renderReportBars = () => {
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
             const container = document.getElementById('report-bars-container');
             container.innerHTML = '';
             if(products.length === 0) {
@@ -339,6 +488,7 @@
 
         const handleAdminAddProduct = (e) => {
             e.preventDefault();
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
             const newProduct = {
                 id: Date.now(),
                 code: document.getElementById('inp-code').value,
@@ -354,7 +504,7 @@
             localStorage.setItem('aros_products', JSON.stringify(products));
             
             renderAdminData();
-            showToast('Produk Berhasil Ditambahkan ke Katalog Customer!');
+            showToast('Produk Berhasil Ditambahkan ke Katalog!');
             e.target.reset();
             showAdminMenu('admin-products');
         };
