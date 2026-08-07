@@ -113,7 +113,7 @@
                 <h2 class="text-2xl font-bold text-brand-dark mb-6">System Access</h2>
                 <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
                     <label class="block text-[10px] text-gray-400 font-semibold mb-1">ID Admin Akses</label>
-                    <input type="text" id="admin-id" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="ADM-001" required>
+                    <input type="text" id="admin-id" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="Contoh: ADM-001" required>
                 </div>
                 <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
                     <label class="block text-[10px] text-gray-400 font-semibold mb-1">Security Code / Password</label>
@@ -122,6 +122,44 @@
                 <button type="submit" class="w-full bg-brand-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.1)] hover:bg-gray-800 transition-all mt-6 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-lock text-xs"></i> Buka Dashboard
                 </button>
+                <div class="text-center mt-6 border-t border-gray-100 pt-6">
+                    <p class="text-[11px] text-gray-400 font-medium mb-3">Belum punya akses Admin?</p>
+                    <button type="button" onclick="switchAdminForm('register')" class="w-full bg-gray-100 text-brand-dark py-3.5 rounded-xl font-bold text-sm shadow-sm hover:bg-gray-200 transition-colors">Daftar Admin Baru</button>
+                </div>
+            </form>
+
+            <!-- FORM 4: ADMIN REGISTER (DENGAN HARDWARE ID) -->
+            <form id="admin-register-form" onsubmit="handleAdminRegister(event)" class="space-y-3 fade-in hidden-form">
+                <div class="flex items-center gap-2 mb-4">
+                    <h2 class="text-2xl font-bold text-brand-dark">Daftar Admin</h2>
+                    <span class="bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest"><i class="fa-solid fa-shield-halved mr-1"></i> Secured</span>
+                </div>
+                
+                <!-- Input Simulasi Kartu Fisik -->
+                <div class="bg-blue-50 p-2.5 px-4 rounded-xl shadow-inner border border-blue-200 focus-within:border-brand-blue transition-colors relative overflow-hidden">
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300 opacity-50"><i class="fa-solid fa-id-card text-2xl"></i></div>
+                    <label class="block text-[10px] text-brand-blue font-bold mb-1 uppercase tracking-wider relative z-10">Scan ID Kartu Fisik *</label>
+                    <input type="text" id="reg-admin-hardware" class="w-full outline-none text-sm font-bold text-brand-dark bg-transparent relative z-10" placeholder="Tap kartu atau ketik ID hardware" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mt-2">
+                    <div class="bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
+                        <label class="block text-[10px] text-gray-400 font-semibold mb-1">ID Admin Baru</label>
+                        <input type="text" id="reg-admin-id" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" placeholder="Contoh: ADM-002" required>
+                    </div>
+                    <div class="bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
+                        <label class="block text-[10px] text-gray-400 font-semibold mb-1">Nama Admin</label>
+                        <input type="text" id="reg-admin-name" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" required>
+                    </div>
+                </div>
+                <div class="bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
+                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Buat Security Code / Password</label>
+                    <input type="password" id="reg-admin-pass" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" placeholder="Min. 6 karakter" required minlength="6">
+                </div>
+                <button type="submit" class="w-full bg-brand-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-gray-900/30 hover:bg-gray-800 transition-colors mt-4">Simpan Akses Admin</button>
+                <div class="text-center mt-4">
+                    <button type="button" onclick="switchAdminForm('login')" class="text-xs font-semibold text-gray-400 hover:text-brand-dark transition-colors">Kembali ke Halaman Login</button>
+                </div>
             </form>
 
         </div>
@@ -129,6 +167,17 @@
 
     <script>
         let isCustomerView = true;
+
+        // Inisialisasi Admin Default agar bisa langsung dicoba
+        const initDefaultAdmin = () => {
+            let admins = JSON.parse(localStorage.getItem('aros_admins'));
+            if(!admins || admins.length === 0) {
+                // Menambahkan hardwareId default juga
+                const defaultAdmin = [{ id: 'admin', name: 'Super Admin', pass: 'admin123', hardwareId: 'MASTER-CARD-001' }];
+                localStorage.setItem('aros_admins', JSON.stringify(defaultAdmin));
+            }
+        };
+        initDefaultAdmin();
 
         // Custom Pop-up Toast
         const showToast = (msg, type = 'success') => {
@@ -152,21 +201,28 @@
         function toggleAdminView() {
             const custLoginForm = document.getElementById('customer-login-form');
             const custRegForm = document.getElementById('customer-register-form');
-            const adminForm = document.getElementById('admin-form');
+            const adminLoginForm = document.getElementById('admin-form');
+            const adminRegForm = document.getElementById('admin-register-form');
+            
             const title = document.getElementById('welcome-title');
             const desc = document.getElementById('welcome-desc');
             const btn = document.getElementById('toggle-btn');
 
-            if (isCustomerView) {
+            if (isCustomerView) { // Beralih ke View Admin
                 custLoginForm.classList.add('hidden-form');
                 custRegForm.classList.add('hidden-form');
-                adminForm.classList.remove('hidden-form');
+                adminRegForm.classList.add('hidden-form');
+                adminLoginForm.classList.remove('hidden-form');
+                
                 title.innerHTML = 'Admin<br>Portal!';
                 desc.innerText = 'Gunakan ID dan Password khusus untuk masuk ke sistem manajemen operasional AROS.';
                 btn.innerText = 'Masuk sebagai Customer';
-            } else {
-                adminForm.classList.add('hidden-form');
+            } else { // Beralih ke View Customer
+                adminLoginForm.classList.add('hidden-form');
+                adminRegForm.classList.add('hidden-form');
+                custRegForm.classList.add('hidden-form');
                 custLoginForm.classList.remove('hidden-form');
+                
                 title.innerHTML = 'Hello,<br>welcome!';
                 desc.innerText = 'Platform sepatu olahraga performa tinggi. Silakan masuk untuk mulai mengeksplorasi produk kami.';
                 btn.innerText = 'Masuk sebagai Admin';
@@ -188,7 +244,21 @@
             }
         }
 
-        // Handle Validasi & Registrasi
+        // Switch between Admin Login & Admin Register
+        function switchAdminForm(target) {
+            const login = document.getElementById('admin-form');
+            const register = document.getElementById('admin-register-form');
+            
+            if (target === 'register') {
+                login.classList.add('hidden-form');
+                register.classList.remove('hidden-form');
+            } else {
+                register.classList.add('hidden-form');
+                login.classList.remove('hidden-form');
+            }
+        }
+
+        // Handle Validasi & Registrasi Customer
         function handleCustomerRegister(e) {
             e.preventDefault();
             const fullName = document.getElementById('reg-fullname').value.trim();
@@ -197,17 +267,13 @@
             const pass = document.getElementById('reg-pass').value.trim();
 
             let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
-            
             const isExist = customers.some(c => c.nickname === nick || c.email === email);
             
             if(isExist) {
                 showToast('Gagal! Nickname atau Email sudah terdaftar.', 'error');
             } else {
                 const newCustomer = {
-                    fullName: fullName,
-                    nickname: nick,
-                    email: email,
-                    password: pass,
+                    fullName: fullName, nickname: nick, email: email, password: pass,
                     dateJoin: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}),
                     status: 'Aktif'
                 };
@@ -217,12 +283,11 @@
                 
                 showToast('Pendaftaran Berhasil! Silakan Login.', 'success');
                 e.target.reset();
-                
                 setTimeout(() => { switchCustomerForm('login'); }, 1500);
             }
         }
 
-        // Handle Customer Login (Otomatis set sesi user aktif ke customer.html)
+        // Handle Customer Login
         function handleCustomerLogin(e) {
             e.preventDefault();
             const nick = document.getElementById('login-nick').value.trim();
@@ -232,28 +297,69 @@
             const user = customers.find(c => c.nickname === nick && c.password === pass);
 
             if(user) {
-                // Simpan data sesi aktif agar langsung dikenali di customer.html
                 localStorage.setItem('aros_current_customer', user.nickname);
                 localStorage.setItem('aros_active_user', user.nickname);
                 localStorage.setItem('aros_active_email', user.email || '');
                 localStorage.setItem('aros_active_phone', user.phone || '-');
 
                 showToast('Login Berhasil! Mengalihkan...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'customer.html';
-                }, 800);
+                setTimeout(() => { window.location.href = 'customer.html'; }, 800);
             } else {
                 showToast('Nickname atau Password salah / belum terdaftar!', 'error');
             }
         }
 
-        // Handle Admin Login
+        // Handle Registrasi Admin (DENGAN HARDWARE ID)
+        function handleAdminRegister(e) {
+            e.preventDefault();
+            const hardwareId = document.getElementById('reg-admin-hardware').value.trim();
+            const id = document.getElementById('reg-admin-id').value.trim();
+            const name = document.getElementById('reg-admin-name').value.trim();
+            const pass = document.getElementById('reg-admin-pass').value.trim();
+
+            let admins = JSON.parse(localStorage.getItem('aros_admins')) || [];
+            
+            // Cek apakah ID Admin sudah dipakai
+            const isExist = admins.some(a => a.id === id);
+            // Cek apakah Kartu Fisik ini sudah dipakai admin lain
+            const isHardwareExist = admins.some(a => a.hardwareId === hardwareId);
+            
+            if(isExist) {
+                showToast('Gagal! ID Admin ini sudah digunakan.', 'error');
+            } else if (isHardwareExist) {
+                showToast('Gagal! Kartu Fisik ini sudah terikat ke akun lain.', 'error');
+            } else {
+                // Menyimpan hardware ID bersama data admin lainnya
+                admins.push({ id: id, name: name, pass: pass, hardwareId: hardwareId });
+                localStorage.setItem('aros_admins', JSON.stringify(admins));
+                
+                showToast('Akses Admin berhasil dibuat dari Kartu Fisik!', 'success');
+                e.target.reset();
+                setTimeout(() => { switchAdminForm('login'); }, 1500);
+            }
+        }
+
+        // Handle Admin Login (DENGAN VALIDASI KETAT)
         function handleAdminLogin(e) {
             e.preventDefault();
             const adminId = document.getElementById('admin-id').value.trim();
-            if(adminId !== '') {
-                localStorage.setItem('aros_current_admin', adminId);
-                window.location.href = 'admin.html';
+            const adminPass = document.getElementById('admin-pass').value.trim();
+            
+            // Ambil data admin dari LocalStorage
+            let admins = JSON.parse(localStorage.getItem('aros_admins')) || [];
+            
+            // Cari data admin yang ID dan Passwordnya cocok
+            const validAdmin = admins.find(a => a.id === adminId && a.pass === adminPass);
+
+            if(validAdmin) {
+                localStorage.setItem('aros_current_admin', validAdmin.name);
+                showToast('Akses Diterima! Membuka Dashboard...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 800);
+            } else {
+                // Tampilkan pesan error jika ID atau Password tidak ada di sistem
+                showToast('Akses Ditolak! ID atau Password Admin salah.', 'error');
             }
         }
     </script>
