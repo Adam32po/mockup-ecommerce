@@ -108,7 +108,7 @@
                     <div class="w-full md:w-1/2 flex flex-col justify-center">
                         <div class="flex items-center gap-3 mb-2">
                             <p id="detail-code" class="text-xs uppercase tracking-widest text-brand-500 font-mono bg-brand-50 w-max px-3 py-1 rounded"></p>
-                            <span id="detail-stock-badge" class="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider"></span>
+                            <span id="detail-stock-badge" class="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-all duration-300"></span>
                         </div>
                         <h2 id="detail-name" class="text-4xl font-bold tracking-tighter mb-4 text-brand-900"></h2>
                         <p id="detail-price" class="text-3xl font-bold text-brand-600 mb-6"></p>
@@ -259,11 +259,31 @@
     </div>
 
     <script>
-        const getProducts = () => JSON.parse(localStorage.getItem('aros_products')) || [];
+        // FUNGSI CERDAS: Konversi/Polyfill Data agar mendukung "Stok Per Ukuran"
+        const getProducts = () => {
+            let prods = JSON.parse(localStorage.getItem('aros_products')) || [];
+            
+            prods = prods.map(p => {
+                // Jika produk masih menggunakan format array ukuran lama dan belum punya rincian stok per-ukuran
+                if (p.sizes && !p.sizeDetails) {
+                    let total = p.stock || 0;
+                    let baseStock = Math.floor(total / p.sizes.length);
+                    let remainder = total % p.sizes.length;
+                    
+                    // Kita distribusikan total stok ke masing-masing ukuran secara otomatis
+                    p.sizeDetails = p.sizes.map((sz, idx) => ({
+                        size: sz,
+                        stock: baseStock + (idx < remainder ? 1 : 0)
+                    }));
+                }
+                return p;
+            });
+            return prods;
+        };
 
         let cart = [];
         let currentViewProduct = null;
-        let selectedSize = null;
+        let selectedSize = null; // Menyimpan string ukuran
 
         let activeUser = localStorage.getItem('aros_active_user') || 'Tamu';
         let activeEmail = localStorage.getItem('aros_active_email') || 'tamu@aros.com';
@@ -536,6 +556,7 @@
             const addCartBtn = document.getElementById('btn-add-cart');
             const isSoldOut = (product.stock === 0 || product.stock === undefined);
 
+            // Default State
             if (isSoldOut) {
                 stockBadge.innerText = 'Stok Habis';
                 stockBadge.className = 'text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-red-100 text-red-600';
@@ -544,7 +565,7 @@
                 addCartBtn.className = 'w-full bg-gray-300 text-gray-500 py-4 rounded-xl uppercase tracking-widest text-sm font-bold cursor-not-allowed flex justify-center items-center gap-2 shadow-none';
                 addCartBtn.disabled = true;
             } else {
-                stockBadge.innerText = `Sisa Stok: ${product.stock}`;
+                stockBadge.innerText = `Total Stok: ${product.stock}`;
                 stockBadge.className = 'text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-green-100 text-green-700';
 
                 addCartBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Tambah ke Keranjang';
@@ -554,26 +575,53 @@
             
             const sizeContainer = document.getElementById('detail-sizes');
             sizeContainer.innerHTML = '';
-            product.sizes.forEach(size => {
-                const btn = document.createElement('button');
-                btn.className = 'border-2 border-brand-100 bg-white w-14 h-14 rounded-xl flex items-center justify-center font-bold text-brand-600 hover:border-brand-500 hover:bg-brand-50 transition-colors size-btn';
-                if (isSoldOut) {
-                    btn.classList.add('opacity-50', 'cursor-not-allowed');
-                    btn.disabled = true;
-                }
-                btn.innerText = size;
-                btn.onclick = () => {
-                    if (isSoldOut) return;
-                    document.querySelectorAll('.size-btn').forEach(b => {
-                        b.classList.remove('bg-brand-600', 'text-white', 'border-brand-600');
-                        b.classList.add('bg-white', 'text-brand-600', 'border-brand-100');
-                    });
-                    btn.classList.remove('bg-white', 'text-brand-600', 'border-brand-100');
-                    btn.classList.add('bg-brand-600', 'text-white', 'border-brand-600');
-                    selectedSize = size;
-                };
-                sizeContainer.appendChild(btn);
-            });
+            
+            // Loop data ukuran sepatu untuk membuat tombol ukuran dinamis (dengan infonya)
+            if (product.sizeDetails && product.sizeDetails.length > 0) {
+                product.sizeDetails.forEach(szObj => {
+                    const isSizeEmpty = szObj.stock <= 0;
+                    const btn = document.createElement('button');
+                    
+                    btn.className = `size-btn border-2 w-16 h-14 rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
+                        isSizeEmpty ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed' 
+                                    : 'border-brand-100 bg-white hover:border-brand-500 hover:bg-brand-50 cursor-pointer shadow-sm'
+                    }`;
+                    
+                    btn.innerHTML = `
+                        <span class="text-sm font-bold ${isSizeEmpty ? 'text-gray-400' : 'text-brand-600'}">${szObj.size}</span>
+                        <span class="text-[9px] font-semibold mt-0.5 ${isSizeEmpty ? 'text-red-400' : 'text-brand-400'}">${isSizeEmpty ? 'Habis' : 'Sisa ' + szObj.stock}</span>
+                    `;
+                    
+                    if (isSizeEmpty) btn.disabled = true;
+                    
+                    btn.onclick = () => {
+                        if (isSizeEmpty || isSoldOut) return;
+                        
+                        // Hapus styling aktif dari tombol lain
+                        document.querySelectorAll('.size-btn').forEach(b => {
+                            if(!b.disabled) {
+                                b.classList.remove('bg-brand-600', 'border-brand-600');
+                                b.classList.add('bg-white', 'border-brand-100');
+                                b.querySelector('span:first-child').classList.replace('text-white', 'text-brand-600');
+                                b.querySelector('span:last-child').classList.replace('text-brand-100', 'text-brand-400');
+                            }
+                        });
+                        
+                        // Tambah styling aktif di tombol yg diklik
+                        btn.classList.remove('bg-white', 'border-brand-100');
+                        btn.classList.add('bg-brand-600', 'border-brand-600');
+                        btn.querySelector('span:first-child').classList.replace('text-brand-600', 'text-white');
+                        btn.querySelector('span:last-child').classList.replace('text-brand-400', 'text-brand-100');
+                        
+                        selectedSize = szObj.size; // Simpan hanya data nama ukurannya saja
+                        
+                        // Update Badget Stok
+                        stockBadge.innerText = `Sisa Ukuran ${szObj.size}: ${szObj.stock}`;
+                        stockBadge.className = 'text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-brand-100 text-brand-700 transition-all';
+                    };
+                    sizeContainer.appendChild(btn);
+                });
+            }
 
             addCartBtn.onclick = () => {
                 if (isSoldOut) return showToast('Maaf, stok produk ini sedang habis!', 'error');
@@ -583,7 +631,7 @@
             showCustomerSection('cust-detail');
         };
 
-        // VALIDASI KETAT: Mencegah memasukkan melebihi sisa stok produk
+        // VALIDASI KETAT BERDASARKAN STOK SPESIFIK UKURAN
         const addToCart = (product, size) => {
             if (activeUser === 'Tamu') {
                 showToast('Akses Ditolak! Silakan Daftar atau Login terlebih dahulu.', 'error');
@@ -594,14 +642,21 @@
             const products = getProducts();
             const currentProd = products.find(p => p.id === product.id);
             if (!currentProd || currentProd.stock <= 0) {
-                return showToast('Maaf, stok produk ini sedang habis!', 'error');
+                return showToast('Maaf, stok produk secara keseluruhan sedang habis!', 'error');
+            }
+
+            // Cari detail spesifik ukuran tersebut
+            const sizeData = currentProd.sizeDetails.find(s => s.size === size);
+            if (!sizeData || sizeData.stock <= 0) {
+                return showToast('Maaf, ukuran ini sedang habis!', 'error');
             }
 
             const existing = cart.find(item => item.product.id === product.id && item.size === size);
             const currentQtyInCart = existing ? existing.qty : 0;
 
-            if (currentQtyInCart + 1 > currentProd.stock) {
-                return showToast(`Jumlah di keranjang sudah mencapai batas maksimum sisa stok (${currentProd.stock} pcs)!`, 'error');
+            // Pengecekan limit stok per ukuran
+            if (currentQtyInCart + 1 > sizeData.stock) {
+                return showToast(`Maksimal sisa stok ukuran ${size} adalah ${sizeData.stock} pcs!`, 'error');
             }
 
             if(existing) {
@@ -638,11 +693,14 @@
             const products = getProducts();
             const cartItem = cart[index];
             const currentProd = products.find(p => p.id === cartItem.product.id);
+            
+            // Ambil referensi dari ukuran yang dipilih
+            const sizeData = currentProd.sizeDetails.find(s => s.size === cartItem.size);
 
             const newQty = cartItem.qty + delta;
             if(newQty > 0) {
-                if (currentProd && newQty > currentProd.stock) {
-                    showToast(`Stok tidak mencukupi! Sisa stok tersedia: ${currentProd.stock}`, 'error');
+                if (sizeData && newQty > sizeData.stock) {
+                    showToast(`Stok tidak mencukupi! Sisa ukuran ${cartItem.size} hanya ${sizeData.stock}`, 'error');
                     return;
                 }
                 cartItem.qty = newQty;
@@ -746,11 +804,19 @@
                 localStorage.setItem('aros_customers', JSON.stringify(customers));
             }
 
-            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let products = getProducts();
+            
+            // Pengurangan stok secara cermat di setiap ukuran yang terpengaruh
             cart.forEach(cartItem => {
                 let p = products.find(prod => prod.id === cartItem.product.id);
                 if(p) {
-                    p.stock = Math.max(0, p.stock - cartItem.qty);
+                    let spesifikUkuran = p.sizeDetails.find(s => s.size === cartItem.size);
+                    if (spesifikUkuran) {
+                        spesifikUkuran.stock = Math.max(0, spesifikUkuran.stock - cartItem.qty);
+                    }
+                    
+                    // Kalkulasi ulang seluruh stok dari ukuran-ukuran setelah dibeli
+                    p.stock = p.sizeDetails.reduce((sum, current) => sum + current.stock, 0);
                     p.sold = (p.sold || 0) + cartItem.qty;
                 }
             });
