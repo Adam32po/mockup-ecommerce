@@ -54,16 +54,12 @@
             </nav>
             
             <div class="flex items-center gap-5 text-xl text-brand-700">
-                <!-- Tombol Search -->
                 <button class="hover:text-brand-500 transition cursor-pointer" onclick="openSearchModal()" title="Cari Produk"><i class="fa-solid fa-search"></i></button>
-                <!-- Tombol Lacak Pesanan -->
                 <button class="hover:text-brand-500 transition cursor-pointer" onclick="openTrackModal()" title="Lacak Pesanan"><i class="fa-solid fa-truck-fast"></i></button>
-                <!-- Tombol Profil Akun User -->
                 <button class="hover:text-brand-500 transition cursor-pointer flex items-center gap-2 bg-brand-50 px-3 py-1.5 rounded-full border border-brand-100 text-xs font-bold text-brand-700" onclick="openUserModal()" title="Profil Akun & Member">
                     <i class="fa-solid fa-user-circle text-base text-brand-600"></i>
                     <span id="nav-username">Akun</span>
                 </button>
-                <!-- Tombol Keranjang -->
                 <button class="relative hover:text-brand-500 transition" onclick="toggleCart()">
                     <i class="fa-solid fa-shopping-bag"></i>
                     <span id="cart-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden border-2 border-white shadow-sm">0</span>
@@ -216,12 +212,9 @@
                     <textarea id="chk-address" class="input-minimal bg-white px-4 py-3 rounded-lg border-none shadow-sm resize-none h-24" placeholder="Alamat Lengkap Pengiriman" required></textarea>
                 </div>
                 
-                <!-- Opsi Pembayaran Interaktif dengan Grid UI -->
                 <div>
                     <h3 class="text-sm font-bold text-brand-700 mb-3 ml-2">Metode Pembayaran</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        
-                        <!-- Transfer Bank -->
                         <label class="cursor-pointer relative">
                             <input type="radio" name="payment" value="Transfer Bank" class="peer sr-only" required>
                             <div class="border-2 border-brand-100 bg-white p-3 rounded-xl hover:bg-brand-50 peer-checked:border-brand-500 peer-checked:bg-brand-50 text-brand-400 peer-checked:text-brand-600 transition flex flex-col items-center justify-center text-center h-full shadow-sm">
@@ -229,8 +222,6 @@
                                 <span class="text-xs font-bold">Transfer Bank</span>
                             </div>
                         </label>
-
-                        <!-- QRIS -->
                         <label class="cursor-pointer relative">
                             <input type="radio" name="payment" value="QRIS" class="peer sr-only" required>
                             <div class="border-2 border-brand-100 bg-white p-3 rounded-xl hover:bg-brand-50 peer-checked:border-brand-500 peer-checked:bg-brand-50 text-brand-400 peer-checked:text-brand-600 transition flex flex-col items-center justify-center text-center h-full shadow-sm">
@@ -238,8 +229,6 @@
                                 <span class="text-xs font-bold">QRIS</span>
                             </div>
                         </label>
-
-                        <!-- GoPay -->
                         <label class="cursor-pointer relative">
                             <input type="radio" name="payment" value="GoPay" class="peer sr-only" required>
                             <div class="border-2 border-brand-100 bg-white p-3 rounded-xl hover:bg-brand-50 peer-checked:border-brand-500 peer-checked:bg-brand-50 text-brand-400 peer-checked:text-brand-600 transition flex flex-col items-center justify-center text-center h-full shadow-sm">
@@ -247,8 +236,6 @@
                                 <span class="text-xs font-bold">GoPay</span>
                             </div>
                         </label>
-
-                        <!-- DANA -->
                         <label class="cursor-pointer relative">
                             <input type="radio" name="payment" value="DANA" class="peer sr-only" required>
                             <div class="border-2 border-brand-100 bg-white p-3 rounded-xl hover:bg-brand-50 peer-checked:border-brand-500 peer-checked:bg-brand-50 text-brand-400 peer-checked:text-brand-600 transition flex flex-col items-center justify-center text-center h-full shadow-sm">
@@ -256,8 +243,6 @@
                                 <span class="text-xs font-bold">DANA</span>
                             </div>
                         </label>
-
-                        <!-- COD -->
                         <label class="cursor-pointer relative md:col-span-2">
                             <input type="radio" name="payment" value="COD" class="peer sr-only" required>
                             <div class="border-2 border-brand-100 bg-white p-3 rounded-xl hover:bg-brand-50 peer-checked:border-brand-500 peer-checked:bg-brand-50 text-brand-400 peer-checked:text-brand-600 transition flex flex-col items-center justify-center text-center h-full shadow-sm">
@@ -265,7 +250,6 @@
                                 <span class="text-xs font-bold">Bayar di Tempat (COD)</span>
                             </div>
                         </label>
-                        
                     </div>
                 </div>
                 
@@ -281,7 +265,6 @@
         let currentViewProduct = null;
         let selectedSize = null;
 
-        // Inisialisasi User Aktif saat Halaman Dibuka
         let activeUser = localStorage.getItem('aros_active_user') || 'Tamu';
         let activeEmail = localStorage.getItem('aros_active_email') || 'tamu@aros.com';
         let activePhone = localStorage.getItem('aros_active_phone') || '-';
@@ -313,7 +296,6 @@
 
         const toggleMobileMenu = () => document.getElementById('mobile-menu').classList.toggle('hidden');
 
-        // Logic Modal Search
         const openSearchModal = () => {
             const modal = document.getElementById('modal-search');
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -355,7 +337,6 @@
             });
         };
 
-        // --- FITUR LACAK PESANAN ---
         const openTrackModal = () => {
             const modal = document.getElementById('modal-track');
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -404,7 +385,6 @@
             });
         };
 
-        // --- FITUR PROFIL USER & MEMBER REWARD ---
         const openUserModal = () => {
             const modal = document.getElementById('modal-user');
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -425,7 +405,6 @@
             let rewardPoints = Math.floor(totalSpent / 10000);
             let memberLevel = totalSpent > 3000000 ? 'Gold Member ⭐' : totalSpent > 1000000 ? 'Silver Member 🥈' : 'Bronze Member 🥉';
             
-            // Jika akun Tamu
             if (activeUser === 'Tamu') {
                 memberLevel = 'Tamu (Guest)';
                 rewardPoints = 0;
@@ -446,7 +425,6 @@
             }
 
             container.innerHTML = `
-                <!-- Card Identitas -->
                 <div class="bg-white p-6 rounded-2xl border border-brand-100 shadow-sm space-y-4">
                     <div class="flex items-center gap-4 border-b border-brand-50 pb-4">
                         <div class="w-14 h-14 rounded-full bg-brand-600 text-white flex items-center justify-center text-2xl font-bold">
@@ -474,7 +452,6 @@
                     ` : ''}
                 </div>
 
-                <!-- Reward Points & Voucher -->
                 <div class="bg-gradient-to-br from-brand-600 to-brand-900 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
                     <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl"><i class="fa-solid fa-coins"></i></div>
                     <div class="flex justify-between items-start relative z-10 mb-4">
@@ -487,7 +464,6 @@
                     <p class="text-xs text-brand-100 leading-relaxed relative z-10">Poin bertambah otomatis setiap kali kamu menyelesaikan transaksi pembelian produk.</p>
                 </div>
 
-                <!-- Daftar Barang yang Dibeli User -->
                 <div>
                     <h4 class="text-xs uppercase tracking-widest font-bold text-brand-700 mb-3"><i class="fa-solid fa-bag-shopping mr-1"></i> Barang yang Telah Dibeli</h4>
                     <div class="max-h-48 overflow-y-auto space-y-1">
@@ -556,7 +532,6 @@
             document.getElementById('detail-name').innerText = product.name;
             document.getElementById('detail-price').innerText = formatRupiah(product.price);
             
-            // Cek Stok Produk
             const stockBadge = document.getElementById('detail-stock-badge');
             const addCartBtn = document.getElementById('btn-add-cart');
             const isSoldOut = (product.stock === 0 || product.stock === undefined);
@@ -608,17 +583,35 @@
             showCustomerSection('cust-detail');
         };
 
+        // VALIDASI KETAT: Mencegah memasukkan melebihi sisa stok produk
         const addToCart = (product, size) => {
-            // BLOKIR AKSES JIKA TAMU (GUEST)
             if (activeUser === 'Tamu') {
                 showToast('Akses Ditolak! Silakan Daftar atau Login terlebih dahulu.', 'error');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
                 return;
             }
 
+            const products = getProducts();
+            const currentProd = products.find(p => p.id === product.id);
+            if (!currentProd || currentProd.stock <= 0) {
+                return showToast('Maaf, stok produk ini sedang habis!', 'error');
+            }
+
             const existing = cart.find(item => item.product.id === product.id && item.size === size);
-            if(existing) existing.qty += 1; else cart.push({ product, size, qty: 1 });
-            updateCartBadge(); renderCartUI(); showToast('Berhasil dimasukkan ke Keranjang!');
+            const currentQtyInCart = existing ? existing.qty : 0;
+
+            if (currentQtyInCart + 1 > currentProd.stock) {
+                return showToast(`Jumlah di keranjang sudah mencapai batas maksimum sisa stok (${currentProd.stock} pcs)!`, 'error');
+            }
+
+            if(existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ product: currentProd, size, qty: 1 });
+            }
+            updateCartBadge(); 
+            renderCartUI(); 
+            showToast('Berhasil dimasukkan ke Keranjang!');
         };
 
         const updateCartBadge = () => {
@@ -640,10 +633,24 @@
             }
         };
 
+        // VALIDASI KETAT SAAT MENGUBAH JUMLAH DI KERANJANG
         const updateQty = (index, delta) => {
-            cart[index].qty += delta;
-            if(cart[index].qty <= 0) cart.splice(index, 1);
-            updateCartBadge(); renderCartUI();
+            const products = getProducts();
+            const cartItem = cart[index];
+            const currentProd = products.find(p => p.id === cartItem.product.id);
+
+            const newQty = cartItem.qty + delta;
+            if(newQty > 0) {
+                if (currentProd && newQty > currentProd.stock) {
+                    showToast(`Stok tidak mencukupi! Sisa stok tersedia: ${currentProd.stock}`, 'error');
+                    return;
+                }
+                cartItem.qty = newQty;
+            } else {
+                cart.splice(index, 1);
+            }
+            updateCartBadge(); 
+            renderCartUI();
         };
 
         const renderCartUI = () => {
@@ -684,7 +691,6 @@
         const openCheckout = () => {
             if(cart.length === 0) return showToast('Keranjang kosong!', 'error');
 
-            // BLOKIR AKSES JIKA TAMU (GUEST) MELAKUKAN CHECKOUT
             if(activeUser === 'Tamu') {
                 showToast('Akses Ditolak! Silakan Daftar atau Login terlebih dahulu.', 'error');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
