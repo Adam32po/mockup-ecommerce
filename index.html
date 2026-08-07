@@ -75,12 +75,24 @@
                         </button>
                     </div>
                 </div>
-                <div class="flex justify-between items-center px-2 py-2">
+                <div class="flex justify-between items-center px-2 py-2 mb-2">
                     <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer font-medium"><input type="checkbox" checked> Remember me</label>
                     <a href="#" class="text-xs text-gray-400 hover:text-brand-blue font-medium">Forgot password?</a>
                 </div>
-                <button type="submit" class="w-full bg-white text-brand-blue py-3.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] border border-gray-50 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] transition-all mt-2">Masuk Belanja</button>
-                <div class="text-center mt-8 border-t border-gray-100 pt-6">
+                
+                <button type="submit" class="w-full bg-white text-brand-blue py-3.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] border border-gray-50 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] transition-all">Masuk Belanja</button>
+                
+                <!-- BAGIAN TAMU (GUEST) DITAMBAHKAN DI SINI -->
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-100"></div>
+                    <span class="flex-shrink-0 mx-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest">ATAU</span>
+                    <div class="flex-grow border-t border-gray-100"></div>
+                </div>
+                <button type="button" onclick="handleGuestLogin()" class="w-full bg-gray-50 text-gray-600 py-3 rounded-xl font-bold text-sm border border-gray-200 hover:bg-gray-100 hover:text-brand-dark transition-all flex items-center justify-center gap-2">
+                    <i class="fa-regular fa-user"></i> Masuk sebagai Tamu
+                </button>
+
+                <div class="text-center mt-6 border-t border-gray-100 pt-6">
                     <p class="text-[11px] text-gray-400 font-medium mb-3">Belum punya akun AROS?</p>
                     <button type="button" onclick="switchCustomerForm('register')" class="w-full bg-[#3b82f6] text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-colors">Daftar Akun Baru</button>
                 </div>
@@ -345,6 +357,18 @@
             } else {
                 showToast('Nickname atau Password salah / belum terdaftar!', 'error');
             }
+        }
+
+        // --- FUNGSI MASUK SEBAGAI TAMU (GUEST) ---
+        function handleGuestLogin() {
+            // Set identitas sebagai Tamu agar tidak perlu validasi password
+            localStorage.setItem('aros_current_customer', 'Tamu');
+            localStorage.setItem('aros_active_user', 'Tamu');
+            localStorage.setItem('aros_active_email', 'guest@aros.com');
+            localStorage.setItem('aros_active_phone', '-');
+
+            showToast('Masuk sebagai Tamu! Mengalihkan...', 'success');
+            setTimeout(() => { window.location.href = 'customer.html'; }, 800);
         }
 
         // Handle Registrasi Admin (DENGAN HARDWARE ID)
