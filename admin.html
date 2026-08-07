@@ -138,13 +138,13 @@
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h3 class="text-2xl font-bold">Katalog Produk AROS</h3>
-                        <p class="text-xs text-brand-500 mt-1">Produk dengan stok 0 otomatis terkunci dan berlabel "Habis" bagi pelanggan.</p>
+                        <p class="text-xs text-brand-500 mt-1">Kelola stok, ukuran, dan status produk secara real-time.</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-brand-50 text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
-                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga</th><th class="p-4 font-semibold">Status Stok Pelanggan</th><th class="p-4 font-semibold">Aksi / Terjual</th></tr>
+                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga</th><th class="p-4 font-semibold">Stok & Ukuran Tersedia</th><th class="p-4 font-semibold">Aksi / Terjual</th></tr>
                         </thead>
                         <tbody id="admin-product-table-body" class="divide-y divide-brand-50"></tbody>
                     </table>
@@ -163,8 +163,9 @@
                         <div><label class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
                         <div class="grid grid-cols-2 gap-6">
                             <div><label class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
-                            <div><label class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Ukuran Tersedia (Pisah Koma)</label><input type="text" id="inp-sizes" class="input-minimal mt-2" required placeholder="39, 40, 41, 42, 43"></div>
                         </div>
+                        <div><label class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
                         <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan & Sinkronisasi</button>
                     </form>
                 </div>
@@ -339,6 +340,7 @@
 
             products.forEach(p => {
                 const isSoldOut = (p.stock === 0 || p.stock === undefined);
+                const sizesText = p.sizes ? p.sizes.join(', ') : '-';
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-brand-50 transition-colors";
                 tr.innerHTML = `
@@ -348,16 +350,19 @@
                     </td>
                     <td class="p-4 font-medium">${formatRupiah(p.price)}</td>
                     <td class="p-4">
-                        <div class="flex items-center gap-2">
-                            <span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span>
-                            ${isSoldOut ? '<span class="bg-red-100 text-red-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Terkunci (Habis)</span>' : '<span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Aktif / Tersedia</span>'}
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span>
+                                ${isSoldOut ? '<span class="bg-red-100 text-red-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Terkunci (Habis)</span>' : '<span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Aktif / Tersedia</span>'}
+                            </div>
+                            <span class="text-[11px] text-brand-500">Ukuran: <b>${sizesText}</b></span>
                         </div>
                     </td>
                     <td class="p-4">
                         <div class="flex items-center gap-2">
                             <span class="font-medium text-brand-600 mr-2">${p.sold || 0} terjual</span>
-                            <button onclick="restockProduct(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Tambah Stok">
-                                <i class="fa-solid fa-plus"></i> Restock
+                            <button onclick="restockProduct(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Tambah Stok & Perbarui Ukuran">
+                                <i class="fa-solid fa-plus"></i> Restock & Ukuran
                             </button>
                             <button onclick="deleteProduct(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Hapus Produk">
                                 <i class="fa-solid fa-trash"></i> Hapus
@@ -373,14 +378,21 @@
             let products = JSON.parse(localStorage.getItem('aros_products')) || [];
             let p = products.find(prod => prod.id === id);
             if(p) {
-                let addQty = prompt(`Masukkan jumlah stok yang ingin ditambahkan untuk "${p.name}":`, "10");
+                let addQty = prompt(`Masukkan jumlah stok tambahan untuk "${p.name}":`, "10");
                 if(addQty !== null) {
                     let qtyNum = parseInt(addQty);
                     if(!isNaN(qtyNum) && qtyNum > 0) {
+                        let currentSizesStr = p.sizes ? p.sizes.join(', ') : '39, 40, 41, 42, 43';
+                        let newSizesStr = prompt(`Perbarui ukuran tersedia (pisahkan dengan koma):`, currentSizesStr);
+                        
                         p.stock += qtyNum;
+                        if(newSizesStr !== null && newSizesStr.trim() !== '') {
+                            p.sizes = newSizesStr.split(',').map(s => s.trim()).filter(Boolean);
+                        }
+
                         localStorage.setItem('aros_products', JSON.stringify(products));
                         renderAdminData();
-                        showToast(`Stok ${p.name} berhasil ditambah sebanyak ${qtyNum} pcs! Produk kembali aktif.`);
+                        showToast(`Stok & ukuran ${p.name} berhasil diperbarui! Produk kembali aktif.`);
                     } else {
                         alert('Jumlah stok yang dimasukkan tidak valid!');
                     }
@@ -575,6 +587,10 @@
         const handleAdminAddProduct = (e) => {
             e.preventDefault();
             products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            
+            const sizesInput = document.getElementById('inp-sizes').value;
+            const sizesArray = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(Boolean) : [39, 40, 41, 42, 43];
+
             const newProduct = {
                 id: Date.now(),
                 code: document.getElementById('inp-code').value,
@@ -583,7 +599,7 @@
                 stock: parseInt(document.getElementById('inp-stock').value),
                 sold: 0,
                 imageUrl: document.getElementById('inp-image').value,
-                sizes: [39, 40, 41, 42, 43]
+                sizes: sizesArray
             };
 
             products.push(newProduct);
