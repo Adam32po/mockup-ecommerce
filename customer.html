@@ -34,7 +34,7 @@
 <body class="font-sans bg-brand-50 text-brand-900 antialiased overflow-x-hidden min-h-screen flex flex-col">
 
     <div id="toast" class="fixed bottom-5 right-5 bg-brand-600 text-white px-6 py-3 rounded-lg shadow-lg shadow-brand-500/30 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
-        <i class="fa-solid fa-check-circle"></i>
+        <i class="fa-solid fa-circle-info"></i>
         <span id="toast-message">Notifikasi</span>
     </div>
 
@@ -196,7 +196,7 @@
         </div>
     </div>
 
-    <!-- Checkout Modal (DIPERBARUI) -->
+    <!-- Checkout Modal -->
     <div id="modal-checkout" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-brand-900/60 backdrop-blur-md" onclick="closeCheckout()"></div>
         <div class="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 rounded-3xl shadow-2xl fade-in border border-brand-100">
@@ -283,8 +283,18 @@
         let activeEmail = localStorage.getItem('aros_active_email') || 'tamu@aros.com';
         let activePhone = localStorage.getItem('aros_active_phone') || '-';
 
-        const showToast = (msg) => {
+        const showToast = (msg, type = 'info') => {
             const toast = document.getElementById('toast');
+            const icon = toast.querySelector('i');
+            
+            if(type === 'error') {
+                toast.className = "fixed bottom-5 right-5 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg shadow-red-500/30 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3";
+                icon.className = "fa-solid fa-circle-exclamation";
+            } else {
+                toast.className = "fixed bottom-5 right-5 bg-brand-600 text-white px-6 py-3 rounded-lg shadow-lg shadow-brand-500/30 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3";
+                icon.className = "fa-solid fa-circle-info";
+            }
+
             document.getElementById('toast-message').innerText = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
@@ -411,6 +421,12 @@
             let totalSpent = userOrders.reduce((acc, o) => acc + o.total, 0);
             let rewardPoints = Math.floor(totalSpent / 10000);
             let memberLevel = totalSpent > 3000000 ? 'Gold Member ⭐' : totalSpent > 1000000 ? 'Silver Member 🥈' : 'Bronze Member 🥉';
+            
+            // Jika akun Tamu
+            if (activeUser === 'Tamu') {
+                memberLevel = 'Tamu (Guest)';
+                rewardPoints = 0;
+            }
 
             let itemsListHTML = '';
             if(userOrders.length === 0) {
@@ -448,6 +464,11 @@
                             <span class="font-bold text-brand-800">${activePhone}</span>
                         </div>
                     </div>
+                    ${activeUser === 'Tamu' ? `
+                    <div class="mt-4 text-center">
+                        <a href="index.html" class="block w-full bg-brand-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-brand-700 transition">Daftar / Login Sekarang</a>
+                    </div>
+                    ` : ''}
                 </div>
 
                 <!-- Reward Points & Voucher -->
@@ -548,13 +569,20 @@
             });
 
             document.getElementById('btn-add-cart').onclick = () => {
-                if(!selectedSize) return showToast('Pilih ukuran sepatu terlebih dahulu!');
+                if(!selectedSize) return showToast('Pilih ukuran sepatu terlebih dahulu!', 'error');
                 addToCart(product, selectedSize);
             };
             showCustomerSection('cust-detail');
         };
 
         const addToCart = (product, size) => {
+            // BLOKIR AKSES JIKA TAMU (GUEST)
+            if (activeUser === 'Tamu') {
+                showToast('Akses Ditolak! Silakan Daftar atau Login terlebih dahulu.', 'error');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                return;
+            }
+
             const existing = cart.find(item => item.product.id === product.id && item.size === size);
             if(existing) existing.qty += 1; else cart.push({ product, size, qty: 1 });
             updateCartBadge(); renderCartUI(); showToast('Berhasil dimasukkan ke Keranjang!');
@@ -621,7 +649,15 @@
         };
 
         const openCheckout = () => {
-            if(cart.length === 0) return showToast('Keranjang kosong!');
+            if(cart.length === 0) return showToast('Keranjang kosong!', 'error');
+
+            // BLOKIR AKSES JIKA TAMU (GUEST) MELAKUKAN CHECKOUT
+            if(activeUser === 'Tamu') {
+                showToast('Akses Ditolak! Silakan Daftar atau Login terlebih dahulu.', 'error');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                return;
+            }
+
             toggleCart(); 
             const modal = document.getElementById('modal-checkout');
             modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -639,10 +675,8 @@
             const phone = document.getElementById('chk-phone').value;
             const address = document.getElementById('chk-address').value;
             
-            // Ambil metode pembayaran yang dipilih (DIPERBARUI)
             const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
             
-            // Perbarui sesi user aktif saat ini
             activeUser = name;
             activeEmail = email;
             activePhone = phone;
@@ -660,7 +694,7 @@
             orders.push({ 
                 orderId: orderId,
                 name, phone, address, 
-                paymentMethod, // Simpan metode pembayaran
+                paymentMethod,
                 items: itemsSummary, total, 
                 date: new Date().toLocaleDateString(),
                 status: 'Sedang Dikemas'
