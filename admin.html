@@ -142,11 +142,16 @@
 
             <!-- Katalog Produk -->
             <div id="admin-products" class="admin-section view-hidden fade-in">
-                <h3 class="text-2xl font-bold mb-8">Katalog Produk AROS</h3>
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold">Katalog Produk AROS</h3>
+                        <p class="text-xs text-brand-500 mt-1">Stok produk otomatis tersinkronisasi langsung dengan katalog pelanggan.</p>
+                    </div>
+                </div>
                 <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-brand-50 text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
-                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga</th><th class="p-4 font-semibold">Stok</th><th class="p-4 font-semibold">Terjual</th></tr>
+                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga</th><th class="p-4 font-semibold">Stok & Status Pelanggan</th><th class="p-4 font-semibold">Terjual</th></tr>
                         </thead>
                         <tbody id="admin-product-table-body" class="divide-y divide-brand-50"></tbody>
                     </table>
@@ -278,14 +283,10 @@
             const currentAdminName = localStorage.getItem('aros_current_admin') || 'Super Admin';
             const admins = JSON.parse(localStorage.getItem('aros_admins')) || [];
             
-            // Mencari kecocokan nama, jika tidak ada fallback ke ID 'admin'
             const currentAdminData = admins.find(a => a.name === currentAdminName) || { id: 'admin', name: currentAdminName };
             
-            // Update UI di Sidebar
             document.getElementById('sidebar-admin-name').innerText = currentAdminData.name;
             document.getElementById('sidebar-admin-id').innerText = `ID: ${currentAdminData.id}`;
-            
-            // Update UI di Dashboard
             document.getElementById('dash-admin-name').innerText = currentAdminData.name;
         };
 
@@ -346,6 +347,7 @@
             }
 
             products.forEach(p => {
+                const isSoldOut = (p.stock === 0 || p.stock === undefined);
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-brand-50 transition-colors";
                 tr.innerHTML = `
@@ -354,7 +356,12 @@
                         <div><p class="font-bold text-brand-900">${p.name}</p><p class="text-xs text-brand-500 font-mono">${p.code}</p></div>
                     </td>
                     <td class="p-4 font-medium">${formatRupiah(p.price)}</td>
-                    <td class="p-4"><span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span></td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span>
+                            ${isSoldOut ? '<span class="bg-red-100 text-red-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Stok Habis (Customer Terblokir)</span>' : '<span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Tersedia</span>'}
+                        </div>
+                    </td>
                     <td class="p-4 font-medium text-brand-600">${p.sold || 0}</td>
                 `;
                 tbody.appendChild(tr);
@@ -557,7 +564,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderAdminData();
-            initAdminProfile(); // Memanggil data admin saat halaman dimuat
+            initAdminProfile();
         });
     </script>
 </body>
