@@ -47,9 +47,21 @@
             <div class="p-8 border-b border-brand-100 bg-brand-900 text-white relative overflow-hidden">
                 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmcHqbGY0tJyyxBrlWjlFFx9BCd96X2maGL6mhyv2Wzw&s=10" class="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-overlay">
                 <div class="absolute inset-0 bg-brand-900/80 z-0"></div>
+                
                 <div class="relative z-10">
                     <h2 class="text-2xl font-bold tracking-tighter">AROS</h2>
                     <p class="text-xs uppercase tracking-widest text-brand-100 mt-1">Admin Panel</p>
+                </div>
+
+                <!-- INFO ADMIN DI SIDEBAR -->
+                <div class="relative z-10 mt-6 pt-5 border-t border-brand-700 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm shadow-inner">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <p id="sidebar-admin-name" class="text-sm font-bold text-white leading-tight">Admin</p>
+                        <p id="sidebar-admin-id" class="text-[10px] text-brand-200 font-mono mt-0.5 uppercase tracking-widest">ID: -</p>
+                    </div>
                 </div>
             </div>
 
@@ -63,7 +75,7 @@
                 <button onclick="showAdminMenu('admin-daily')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Harian</button>
             </nav>
             <div class="p-4 border-t border-brand-100">
-                <a href="index.html" class="block w-full text-center px-4 py-3 text-sm text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors font-semibold">Log Out</a>
+                <a href="index.html" class="block w-full text-center px-4 py-3 text-sm text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors font-semibold"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out</a>
             </div>
         </aside>
 
@@ -72,8 +84,23 @@
             
             <!-- Dashboard -->
             <div id="admin-dash" class="admin-section fade-in">
-                <h3 class="text-2xl font-bold mb-2">Overview Kinerja</h3>
-                <p class="text-brand-500 mb-8">Data real-time toko.</p>
+                <!-- HEADER DASHBOARD DENGAN INFO ADMIN -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1 text-brand-900">Overview Kinerja</h3>
+                        <p class="text-brand-500 text-sm">Data real-time toko.</p>
+                    </div>
+                    
+                    <div class="bg-white px-5 py-2.5 rounded-xl border border-brand-100 shadow-sm flex items-center gap-3">
+                        <div class="text-right">
+                            <p class="text-xs text-brand-500 font-medium">Logged in as</p>
+                            <p class="text-sm font-bold text-brand-700 leading-tight" id="dash-admin-name">Admin</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100">
+                            <i class="fa-solid fa-id-badge"></i>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- 4 Grid Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -246,6 +273,22 @@
         let orders = [];
         let savedExpense = 0;
 
+        // FUNGSI LOAD PROFIL ADMIN
+        const initAdminProfile = () => {
+            const currentAdminName = localStorage.getItem('aros_current_admin') || 'Super Admin';
+            const admins = JSON.parse(localStorage.getItem('aros_admins')) || [];
+            
+            // Mencari kecocokan nama, jika tidak ada fallback ke ID 'admin'
+            const currentAdminData = admins.find(a => a.name === currentAdminName) || { id: 'admin', name: currentAdminName };
+            
+            // Update UI di Sidebar
+            document.getElementById('sidebar-admin-name').innerText = currentAdminData.name;
+            document.getElementById('sidebar-admin-id').innerText = `ID: ${currentAdminData.id}`;
+            
+            // Update UI di Dashboard
+            document.getElementById('dash-admin-name').innerText = currentAdminData.name;
+        };
+
         const showToast = (msg) => {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').innerText = msg;
@@ -292,7 +335,6 @@
 
             document.getElementById('stat-total-revenue').innerText = formatRupiah(netProfit);
 
-            // Render grafik batang keuangan 3 hari
             renderFinancialBars(totalIncome, savedExpense);
 
             const tbody = document.getElementById('admin-product-table-body');
@@ -421,7 +463,6 @@
             showToast('Status pengiriman berhasil diperbarui!');
         };
 
-        // --- BAGIAN YANG DIPERBARUI: MENAMBAHKAN METODE PEMBAYARAN ---
         const renderOrdersTable = () => {
             orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
             const tbody = document.getElementById('admin-orders-table');
@@ -437,8 +478,6 @@
                 const originalIndex = orders.length - 1 - reversedIndex;
                 let itemsList = o.items.map(i => `${i.name} (x${i.qty})`).join('<br>');
                 let currentStatus = o.status || 'Sedang Dikemas';
-                
-                // Ambil metode pembayaran, berikan nilai fallback 'Transfer Bank' jika tidak ditemukan (untuk data lama)
                 let paymentMethod = o.paymentMethod || 'Transfer Bank'; 
                 
                 let selectHTML = `<select onchange="updateOrderStatus(${originalIndex}, this.value)" class="text-xs p-2 rounded-lg border border-brand-200 bg-brand-50 text-brand-700 font-bold outline-none cursor-pointer hover:border-brand-400 transition w-full">`;
@@ -457,7 +496,6 @@
                         </td>
                         <td class="p-3 text-xs leading-relaxed">${itemsList}</td>
                         <td class="p-3">
-                            <!-- Menampilkan Total Bayar & Metode Pembayaran di Kolom yang Sama -->
                             <span class="font-bold text-brand-700 block">${formatRupiah(o.total)}</span>
                             <span class="inline-block mt-1 bg-brand-100 text-brand-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">${paymentMethod}</span>
                         </td>
@@ -517,7 +555,10 @@
             showAdminMenu('admin-products');
         };
 
-        document.addEventListener('DOMContentLoaded', renderAdminData);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAdminData();
+            initAdminProfile(); // Memanggil data admin saat halaman dimuat
+        });
     </script>
 </body>
 </html>
