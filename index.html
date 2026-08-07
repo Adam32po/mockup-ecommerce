@@ -3,259 +3,521 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AROS - Welcome</title>
+    <title>AROS - Admin Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
+            theme: { 
+                extend: { 
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { brand: { blue: '#2a75d3', dark: '#112240', light: '#f4f7fb', red: '#ef4444' } }
-                }
+                    colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' } }
+                } 
             }
         }
     </script>
     
     <style>
-        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
-        input[type="checkbox"] { accent-color: #2a75d3; width: 14px; height: 14px; }
-        .hidden-form { display: none !important; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f9ff; }
+        ::-webkit-scrollbar-thumb { background: #0284c7; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .input-minimal { width: 100%; border: none; border-bottom: 1px solid #bae6fd; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #0c4a6e;}
+        .input-minimal:focus { border-bottom-color: #0284c7; }
+        .view-hidden { display: none !important; }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
-<body class="font-sans bg-gradient-to-br from-indigo-200 via-purple-200 to-blue-200 antialiased min-h-screen flex items-center justify-center p-4">
+<body class="font-sans bg-brand-50 text-brand-900 antialiased">
 
-    <!-- Global Toast Notification -->
-    <div id="toast" class="fixed top-5 right-5 text-white px-6 py-3 rounded-xl shadow-xl transform -translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm">
-        <i id="toast-icon" class="fa-solid fa-check-circle"></i>
+    <div id="toast" class="fixed bottom-5 right-5 bg-brand-600 text-white px-6 py-3 rounded-lg shadow-lg shadow-brand-500/30 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-check-circle"></i>
         <span id="toast-message">Notifikasi</span>
     </div>
 
-    <!-- Main Card Container -->
-    <div class="w-full max-w-[900px] bg-brand-light shadow-2xl rounded-3xl overflow-hidden flex flex-col md:flex-row relative z-10">
-        
-        <!-- Left Panel (Dark Blue Overlay) -->
-        <div class="w-full md:w-5/12 relative p-10 md:p-12 flex flex-col justify-between min-h-[300px] md:min-h-[600px]">
-            <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=800&q=80" class="absolute inset-0 w-full h-full object-cover z-0 grayscale">
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-900/95 to-brand-dark/95 z-0"></div>
-
-            <div class="relative z-10 flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-white flex items-center justify-center"><div class="w-2 h-2 rounded-full bg-blue-900"></div></div>
-                <span class="font-bold tracking-widest text-white text-lg">AROS</span>
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-white border-r border-brand-100 flex flex-col shadow-sm z-10">
+            <!-- Header Sidebar dengan Background Image -->
+            <div class="p-8 border-b border-brand-100 bg-brand-900 text-white relative overflow-hidden">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmcHqbGY0tJyyxBrlWjlFFx9BCd96X2maGL6mhyv2Wzw&s=10" class="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-overlay">
+                <div class="absolute inset-0 bg-brand-900/80 z-0"></div>
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold tracking-tighter">AROS</h2>
+                    <p class="text-xs uppercase tracking-widest text-brand-100 mt-1">Admin Panel</p>
+                </div>
             </div>
 
-            <div class="relative z-10 mt-16 md:mt-auto">
-                <h1 id="welcome-title" class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight tracking-tight">Hello,<br>welcome!</h1>
-                <p id="welcome-desc" class="text-xs md:text-sm text-blue-100/70 mb-8 leading-relaxed max-w-xs">Platform sepatu olahraga performa tinggi. Silakan masuk untuk mulai mengeksplorasi produk kami.</p>
-                <button type="button" onclick="toggleAdminView()" id="toggle-btn" class="border border-white/60 text-white px-6 py-2.5 rounded-full text-xs font-semibold hover:bg-white hover:text-brand-dark transition-colors duration-300">
-                    Masuk sebagai Admin
-                </button>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="showAdminMenu('admin-dash')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors font-medium">Dashboard</button>
+                <button onclick="showAdminMenu('admin-products')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Katalog Produk</button>
+                <button onclick="showAdminMenu('admin-input')" class="w-full text-left px-4 py-3 rounded text-sm bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors font-semibold shadow-sm">+ Input Barang</button>
+                <button onclick="showAdminMenu('admin-history')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">History Akun</button>
+                <button onclick="showAdminMenu('admin-customers')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Data Pelanggan</button>
+                <button onclick="showAdminMenu('admin-reports')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Produk</button>
+                <button onclick="showAdminMenu('admin-daily')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Harian</button>
+            </nav>
+            <div class="p-4 border-t border-brand-100">
+                <a href="index.html" class="block w-full text-center px-4 py-3 text-sm text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors font-semibold">Log Out</a>
             </div>
-        </div>
+        </aside>
 
-        <!-- Right Panel (Forms) -->
-        <div class="w-full md:w-7/12 p-8 md:p-14 flex flex-col justify-center bg-white relative overflow-hidden">
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12 overflow-y-auto">
             
-            <!-- FORM 1: CUSTOMER LOGIN -->
-            <form id="customer-login-form" onsubmit="handleCustomerLogin(event)" class="space-y-4 fade-in">
-                <h2 class="text-2xl font-bold text-brand-dark mb-6">Masuk Akun</h2>
-                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
-                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Nickname / Username</label>
-                    <input type="text" id="login-nick" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" placeholder="Masukkan nickname" required>
-                </div>
-                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
-                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Password</label>
-                    <input type="password" id="login-pass" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" placeholder="••••••••" required>
-                </div>
-                <div class="flex justify-between items-center px-2 py-2">
-                    <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer font-medium"><input type="checkbox" checked> Remember me</label>
-                    <a href="#" class="text-xs text-gray-400 hover:text-brand-blue font-medium">Forgot password?</a>
-                </div>
-                <button type="submit" class="w-full bg-white text-brand-blue py-3.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.05)] border border-gray-50 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] transition-all mt-2">Masuk Belanja</button>
-                <div class="text-center mt-8 border-t border-gray-100 pt-6">
-                    <p class="text-[11px] text-gray-400 font-medium mb-3">Belum punya akun AROS?</p>
-                    <button type="button" onclick="switchCustomerForm('register')" class="w-full bg-[#3b82f6] text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-colors">Daftar Akun Baru</button>
-                </div>
-            </form>
-
-            <!-- FORM 2: CUSTOMER REGISTER -->
-            <form id="customer-register-form" onsubmit="handleCustomerRegister(event)" class="space-y-3 fade-in hidden-form">
-                <h2 class="text-2xl font-bold text-brand-dark mb-4">Daftar Akun</h2>
-                <div class="bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
-                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Nama Lengkap</label>
-                    <input type="text" id="reg-fullname" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" required>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
-                        <label class="block text-[10px] text-gray-400 font-semibold mb-1">Nickname (Unik)</label>
-                        <input type="text" id="reg-nick" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" required>
+            <!-- Dashboard -->
+            <div id="admin-dash" class="admin-section fade-in">
+                <h3 class="text-2xl font-bold mb-2">Overview Kinerja</h3>
+                <p class="text-brand-500 mb-8">Data real-time toko.</p>
+                
+                <!-- 4 Grid Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Produk</p>
+                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-product">0</h4>
                     </div>
-                    <div class="bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
-                        <label class="block text-[10px] text-gray-400 font-semibold mb-1">Alamat Email</label>
-                        <input type="email" id="reg-email" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" required>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Terjual</p>
+                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-sold">0</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">User Aktif</p>
+                        <h4 class="text-4xl font-bold text-emerald-600" id="stat-active-users">0</h4>
+                    </div>
+                    <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-brand-600 to-brand-900 text-white flex flex-col justify-center">
+                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2">Pendapatan Bersih</p>
+                        <h4 class="text-2xl font-bold" id="stat-total-revenue">Rp 0</h4>
                     </div>
                 </div>
-                <div class="bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-blue transition-colors">
-                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Buat Password</label>
-                    <input type="password" id="reg-pass" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent" placeholder="Min. 6 karakter" required minlength="6">
-                </div>
-                <button type="submit" class="w-full bg-[#3b82f6] text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 hover:bg-blue-600 transition-colors mt-4">Selesaikan Pendaftaran</button>
-                <div class="text-center mt-4">
-                    <button type="button" onclick="switchCustomerForm('login')" class="text-xs font-semibold text-gray-400 hover:text-brand-blue transition-colors">Sudah punya akun? Masuk di sini</button>
-                </div>
-            </form>
 
-            <!-- FORM 3: ADMIN LOGIN -->
-            <form id="admin-form" onsubmit="handleAdminLogin(event)" class="space-y-4 fade-in hidden-form">
-                <h2 class="text-2xl font-bold text-brand-dark mb-6">System Access</h2>
-                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
-                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">ID Admin Akses</label>
-                    <input type="text" id="admin-id" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="ADM-001" required>
+                <!-- Grafik Batang Statistik Keuangan 3 Hari (Kemarin, Hari Ini, Esok) -->
+                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h4 class="text-lg font-bold text-brand-900"><i class="fa-solid fa-chart-bar mr-2 text-brand-600"></i> Statistik Keuangan (3 Hari)</h4>
+                            <p class="text-xs text-brand-500 mt-1">Perbandingan pemasukan dan pengeluaran secara tren harian.</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-semibold">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-brand-600 rounded-sm inline-block"></span> Pemasukan</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-red-400 rounded-sm inline-block"></span> Pengeluaran</span>
+                        </div>
+                    </div>
+                    <div id="financial-bars-container" class="space-y-6">
+                        <!-- Rendered via JavaScript -->
+                    </div>
                 </div>
-                <div class="bg-white p-3 px-5 rounded-xl shadow-sm border border-gray-100 focus-within:border-brand-dark transition-colors">
-                    <label class="block text-[10px] text-gray-400 font-semibold mb-1">Security Code / Password</label>
-                    <input type="password" id="admin-pass" class="w-full outline-none text-sm font-medium text-brand-dark bg-transparent placeholder-gray-300" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="w-full bg-brand-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(0,0,0,0.1)] hover:bg-gray-800 transition-all mt-6 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-lock text-xs"></i> Buka Dashboard
-                </button>
-            </form>
+            </div>
 
-        </div>
+            <!-- Katalog Produk -->
+            <div id="admin-products" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-8">Katalog Produk AROS</h3>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-brand-50 text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga</th><th class="p-4 font-semibold">Stok</th><th class="p-4 font-semibold">Terjual</th></tr>
+                        </thead>
+                        <tbody id="admin-product-table-body" class="divide-y divide-brand-50"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Input Barang -->
+            <div id="admin-input" class="admin-section view-hidden fade-in">
+                <div class="max-w-2xl bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
+                    <h3 class="text-2xl font-bold mb-6 text-brand-600">Tambah Produk Baru</h3>
+                    <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Kode Sepatu</label><input type="text" id="inp-code" class="input-minimal mt-2" required placeholder="AR-001"></div>
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Harga (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
+                        </div>
+                        <div><label class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
+                            <div><label class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
+                        </div>
+                        <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan & Sinkronisasi</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- History Akun Customer -->
+            <div id="admin-history" class="admin-section view-hidden fade-in">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-900">Manajemen Akun Customer</h3>
+                        <p class="text-brand-500 text-sm mt-1">Data sinkronisasi dari pendaftaran sistem utama.</p>
+                    </div>
+                    <div class="bg-brand-100 text-brand-700 px-4 py-2 rounded-lg font-bold text-sm">
+                        Total Pendaftar: <span id="stat-total-users">0</span> Akun
+                    </div>
+                </div>
+
+                <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Pendaftaran Terbaru</h4>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-4 mb-10">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-brand-50">
+                            <tr><th class="p-3">Nickname</th><th class="p-3">Email</th><th class="p-3">Kapan Ditambahkan</th></tr>
+                        </thead>
+                        <tbody id="admin-recent-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+
+                <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-users mr-2"></i> Daftar Seluruh Akun</h4>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-[11px] uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr>
+                                <th class="p-3">Nama Lengkap</th>
+                                <th class="p-3">Username / Nickname</th>
+                                <th class="p-3">Alamat Email</th>
+                                <th class="p-3">Tanggal Daftar</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-full-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Data Pelanggan (Transaksi & Pengiriman) -->
+            <div id="admin-customers" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-8">Data Transaksi & Pengiriman</h3>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr>
+                                <th class="p-3">ID Pesanan</th>
+                                <th class="p-3">Info Pembeli</th>
+                                <th class="p-3">Produk Dibeli</th>
+                                <th class="p-3">Pembayaran</th>
+                                <th class="p-3">Status Pengiriman</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Laporan Produk -->
+            <div id="admin-reports" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-2">Laporan & Statistik Produk</h3>
+                <p class="text-brand-500 mb-8">Perbandingan stok masuk dengan volume produk keluar.</p>
+                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm space-y-8 max-w-3xl" id="report-bars-container"></div>
+            </div>
+
+            <!-- Laporan Harian -->
+            <div id="admin-daily" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-2">Laporan Finansial Harian</h3>
+                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko. Masukkan pengeluaran secara manual.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pemasukan (Otomatis)</p>
+                        <h4 class="text-2xl font-bold text-brand-600" id="daily-income">Rp 0</h4>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Pengeluaran (Manual)</p>
+                        <div class="flex items-center gap-2 border-b-2 border-brand-100 focus-within:border-red-400 transition-colors pb-1">
+                            <span class="text-red-500 font-bold">Rp</span>
+                            <input type="number" id="inp-expense" class="w-full outline-none text-lg font-bold text-red-500 bg-transparent placeholder-red-300" placeholder="0">
+                            <button onclick="saveExpenseData()" class="bg-brand-50 hover:bg-brand-100 text-brand-600 px-3 py-1.5 rounded-lg text-xs font-bold transition ml-auto shadow-sm">Simpan</button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 rounded-xl shadow-md bg-brand-600 text-white flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-brand-500 rounded-full opacity-50 blur-xl"></div>
+                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2 relative z-10">Laba Bersih</p>
+                        <h4 class="text-2xl font-bold relative z-10" id="daily-profit">Rp 0</h4>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <script>
-        let isCustomerView = true;
+        let products = [];
+        let customers = [];
+        let orders = [];
+        let savedExpense = 0;
 
-        // Custom Pop-up Toast
-        const showToast = (msg, type = 'success') => {
+        const showToast = (msg) => {
             const toast = document.getElementById('toast');
-            const icon = document.getElementById('toast-icon');
-            
-            if(type === 'error') {
-                toast.className = "fixed top-5 right-5 bg-brand-red text-white px-6 py-3 rounded-xl shadow-lg transform -translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm";
-                icon.className = "fa-solid fa-circle-exclamation";
-            } else {
-                toast.className = "fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg transform -translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 font-semibold text-sm";
-                icon.className = "fa-solid fa-check-circle";
-            }
-
             document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('-translate-y-20', 'opacity-0');
-            setTimeout(() => toast.classList.add('-translate-y-20', 'opacity-0'), 3000);
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
         };
 
-        // Switch between Admin & Customer Panel
-        function toggleAdminView() {
-            const custLoginForm = document.getElementById('customer-login-form');
-            const custRegForm = document.getElementById('customer-register-form');
-            const adminForm = document.getElementById('admin-form');
-            const title = document.getElementById('welcome-title');
-            const desc = document.getElementById('welcome-desc');
-            const btn = document.getElementById('toggle-btn');
+        const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
 
-            if (isCustomerView) {
-                custLoginForm.classList.add('hidden-form');
-                custRegForm.classList.add('hidden-form');
-                adminForm.classList.remove('hidden-form');
-                title.innerHTML = 'Admin<br>Portal!';
-                desc.innerText = 'Gunakan ID dan Password khusus untuk masuk ke sistem manajemen operasional AROS.';
-                btn.innerText = 'Masuk sebagai Customer';
-            } else {
-                adminForm.classList.add('hidden-form');
-                custLoginForm.classList.remove('hidden-form');
-                title.innerHTML = 'Hello,<br>welcome!';
-                desc.innerText = 'Platform sepatu olahraga performa tinggi. Silakan masuk untuk mulai mengeksplorasi produk kami.';
-                btn.innerText = 'Masuk sebagai Admin';
+        const showAdminMenu = (sectionId) => {
+            document.querySelectorAll('.admin-section').forEach(el => el.classList.add('view-hidden'));
+            document.getElementById(sectionId).classList.remove('view-hidden');
+            
+            renderAdminData();
+            if(sectionId === 'admin-reports') renderReportBars();
+            if(sectionId === 'admin-history') renderHistoryTables();
+            if(sectionId === 'admin-customers') renderOrdersTable();
+        };
+
+        const renderAdminData = () => {
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            savedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
+
+            document.getElementById('stat-total-product').innerText = products.length;
+            let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
+            document.getElementById('stat-total-sold').innerText = totalSold;
+            document.getElementById('stat-active-users').innerText = customers.length;
+
+            let totalIncome = orders.reduce((acc, o) => acc + o.total, 0); 
+            let netProfit = totalIncome - savedExpense; 
+
+            document.getElementById('daily-income').innerText = formatRupiah(totalIncome);
+            
+            const expenseInput = document.getElementById('inp-expense');
+            if (document.activeElement !== expenseInput) {
+                expenseInput.value = savedExpense > 0 ? savedExpense : '';
             }
-            isCustomerView = !isCustomerView;
-        }
-
-        // Switch between Customer Login & Customer Register
-        function switchCustomerForm(target) {
-            const login = document.getElementById('customer-login-form');
-            const register = document.getElementById('customer-register-form');
             
-            if (target === 'register') {
-                login.classList.add('hidden-form');
-                register.classList.remove('hidden-form');
-            } else {
-                register.classList.add('hidden-form');
-                login.classList.remove('hidden-form');
+            const profitEl = document.getElementById('daily-profit');
+            profitEl.innerText = formatRupiah(netProfit);
+            profitEl.className = netProfit < 0 ? "text-2xl font-bold relative z-10 text-red-200" : "text-2xl font-bold relative z-10 text-white";
+
+            document.getElementById('stat-total-revenue').innerText = formatRupiah(netProfit);
+
+            // Render grafik batang keuangan 3 hari
+            renderFinancialBars(totalIncome, savedExpense);
+
+            const tbody = document.getElementById('admin-product-table-body');
+            tbody.innerHTML = '';
+            
+            if(products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-brand-400">Belum ada produk. Silakan tambah barang baru di menu "+ Input Barang".</td></tr>`;
+                return;
             }
-        }
 
-        // Handle Validasi & Registrasi
-        function handleCustomerRegister(e) {
-            e.preventDefault();
-            const fullName = document.getElementById('reg-fullname').value.trim();
-            const nick = document.getElementById('reg-nick').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const pass = document.getElementById('reg-pass').value.trim();
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-brand-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 flex items-center gap-4">
+                        <img src="${p.imageUrl}" class="w-12 h-12 rounded-lg object-cover bg-brand-100 shadow-sm">
+                        <div><p class="font-bold text-brand-900">${p.name}</p><p class="text-xs text-brand-500 font-mono">${p.code}</p></div>
+                    </td>
+                    <td class="p-4 font-medium">${formatRupiah(p.price)}</td>
+                    <td class="p-4"><span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span></td>
+                    <td class="p-4 font-medium text-brand-600">${p.sold || 0}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
 
-            let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+        const renderFinancialBars = (totalIncome, totalExpense) => {
+            const container = document.getElementById('financial-bars-container');
+            container.innerHTML = '';
+
+            const daysData = [
+                { label: 'Kemarin', income: Math.round(totalIncome * 0.3), expense: Math.round(totalExpense * 0.4) },
+                { label: 'Hari Ini', income: Math.round(totalIncome * 0.5), expense: Math.round(totalExpense * 0.5) },
+                { label: 'Esok (Estimasi)', income: Math.round(totalIncome * 0.2), expense: Math.round(totalExpense * 0.1) }
+            ];
+
+            const maxVal = Math.max(...daysData.map(d => Math.max(d.income, d.expense)), 100000);
+
+            daysData.forEach(d => {
+                const incPercent = Math.min(100, Math.round((d.income / maxVal) * 100));
+                const expPercent = Math.min(100, Math.round((d.expense / maxVal) * 100));
+
+                const row = document.createElement('div');
+                row.className = 'border-b border-brand-50 pb-4 last:border-none last:pb-0';
+                row.innerHTML = `
+                    <div class="flex justify-between items-center mb-2 text-xs font-bold uppercase tracking-widest text-brand-700">
+                        <span>${d.label}</span>
+                        <span class="text-brand-500 font-normal">Pemasukan: <strong class="text-brand-700">${formatRupiah(d.income)}</strong> | Pengeluaran: <strong class="text-red-500">${formatRupiah(d.expense)}</strong></span>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pemasukan</span><span>${formatRupiah(d.income)}</span></div>
+                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-brand-600 h-2.5 rounded-full transition-all duration-500" style="width: ${incPercent}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pengeluaran</span><span>${formatRupiah(d.expense)}</span></div>
+                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-red-400 h-2.5 rounded-full transition-all duration-500" style="width: ${expPercent}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        };
+
+        const saveExpenseData = () => {
+            const inputVal = document.getElementById('inp-expense').value;
+            savedExpense = inputVal ? parseInt(inputVal) : 0;
+            localStorage.setItem('aros_expenses', savedExpense);
+            renderAdminData();
+            showToast('Pengeluaran berhasil disimpan & Laba dihitung ulang!');
+        };
+
+        const renderHistoryTables = () => {
+            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+            document.getElementById('stat-total-users').innerText = customers.length;
             
-            const isExist = customers.some(c => c.nickname === nick || c.email === email);
+            const recentTbody = document.getElementById('admin-recent-history-table');
+            const fullTbody = document.getElementById('admin-full-history-table');
             
-            if(isExist) {
-                showToast('Gagal! Nickname atau Email sudah terdaftar.', 'error');
-            } else {
-                const newCustomer = {
-                    fullName: fullName,
-                    nickname: nick,
-                    email: email,
-                    password: pass,
-                    dateJoin: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}),
-                    status: 'Aktif'
-                };
+            recentTbody.innerHTML = '';
+            fullTbody.innerHTML = '';
 
-                customers.push(newCustomer);
-                localStorage.setItem('aros_customers', JSON.stringify(customers));
+            if(customers.length === 0) {
+                const emptyRow = `<tr><td colspan="5" class="p-6 text-center text-brand-400">Belum ada akun customer yang terdaftar dalam sistem.</td></tr>`;
+                recentTbody.innerHTML = emptyRow;
+                fullTbody.innerHTML = emptyRow;
+                return;
+            }
+
+            customers.forEach(c => {
+                const fname = c.fullName || '-';
+                const email = c.email || '-';
+                const nick = c.nickname || c.name || 'Unknown';
                 
-                showToast('Pendaftaran Berhasil! Silakan Login.', 'success');
-                e.target.reset();
-                
-                setTimeout(() => { switchCustomerForm('login'); }, 1500);
-            }
-        }
+                fullTbody.innerHTML += `
+                    <tr class="hover:bg-brand-50 transition">
+                        <td class="p-3 font-semibold text-brand-900">${fname}</td>
+                        <td class="p-3 text-brand-600 font-medium">@${nick}</td>
+                        <td class="p-3 text-gray-500">${email}</td>
+                        <td class="p-3">${c.dateJoin || c.date}</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${c.status || 'Aktif'}</span></td>
+                    </tr>`;
+            });
 
-        // Handle Customer Login (Otomatis set sesi user aktif ke customer.html)
-        function handleCustomerLogin(e) {
-            e.preventDefault();
-            const nick = document.getElementById('login-nick').value.trim();
-            const pass = document.getElementById('login-pass').value.trim();
+            const recentCustomers = [...customers].reverse().slice(0, 3);
+            recentCustomers.forEach(c => {
+                const email = c.email || '-';
+                const nick = c.nickname || c.name || 'Unknown';
+                recentTbody.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-bold text-brand-700">@${nick}</td>
+                        <td class="p-3 text-gray-500">${email}</td>
+                        <td class="p-3 text-xs italic">${c.dateJoin || c.date}</td>
+                    </tr>`;
+            });
+        };
+
+        const updateOrderStatus = (index, newStatus) => {
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            orders[index].status = newStatus;
+            localStorage.setItem('aros_orders', JSON.stringify(orders));
+            showToast('Status pengiriman berhasil diperbarui!');
+        };
+
+        // --- BAGIAN YANG DIPERBARUI: MENAMBAHKAN METODE PEMBAYARAN ---
+        const renderOrdersTable = () => {
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            const tbody = document.getElementById('admin-orders-table');
+            tbody.innerHTML = '';
+            if(orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-brand-400">Belum ada transaksi pesanan masuk.</td></tr>`;
+                return;
+            }
             
-            let customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
-            const user = customers.find(c => c.nickname === nick && c.password === pass);
+            const statusOptions = ['Sedang Dikemas', 'Diserahkan ke Logistik', 'Kurir Menuju Lokasi', 'Pesanan Selesai'];
 
-            if(user) {
-                // Simpan data sesi aktif agar langsung dikenali di customer.html
-                localStorage.setItem('aros_current_customer', user.nickname);
-                localStorage.setItem('aros_active_user', user.nickname);
-                localStorage.setItem('aros_active_email', user.email || '');
-                localStorage.setItem('aros_active_phone', user.phone || '-');
+            [...orders].reverse().forEach((o, reversedIndex) => {
+                const originalIndex = orders.length - 1 - reversedIndex;
+                let itemsList = o.items.map(i => `${i.name} (x${i.qty})`).join('<br>');
+                let currentStatus = o.status || 'Sedang Dikemas';
+                
+                // Ambil metode pembayaran, berikan nilai fallback 'Transfer Bank' jika tidak ditemukan (untuk data lama)
+                let paymentMethod = o.paymentMethod || 'Transfer Bank'; 
+                
+                let selectHTML = `<select onchange="updateOrderStatus(${originalIndex}, this.value)" class="text-xs p-2 rounded-lg border border-brand-200 bg-brand-50 text-brand-700 font-bold outline-none cursor-pointer hover:border-brand-400 transition w-full">`;
+                statusOptions.forEach(opt => {
+                    selectHTML += `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`;
+                });
+                selectHTML += `</select>`;
 
-                showToast('Login Berhasil! Mengalihkan...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'customer.html';
-                }, 800);
-            } else {
-                showToast('Nickname atau Password salah / belum terdaftar!', 'error');
+                tbody.innerHTML += `
+                    <tr class="hover:bg-brand-50 transition">
+                        <td class="p-3 font-mono text-xs font-bold text-brand-600">${o.orderId || 'ORD-LAMA'}</td>
+                        <td class="p-3">
+                            <span class="font-semibold block text-brand-900">${o.name}</span>
+                            <span class="text-[10px] text-gray-500">${o.phone} | ${o.date}</span><br>
+                            <span class="text-xs text-gray-600 line-clamp-2 mt-1">${o.address}</span>
+                        </td>
+                        <td class="p-3 text-xs leading-relaxed">${itemsList}</td>
+                        <td class="p-3">
+                            <!-- Menampilkan Total Bayar & Metode Pembayaran di Kolom yang Sama -->
+                            <span class="font-bold text-brand-700 block">${formatRupiah(o.total)}</span>
+                            <span class="inline-block mt-1 bg-brand-100 text-brand-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">${paymentMethod}</span>
+                        </td>
+                        <td class="p-3">${selectHTML}</td>
+                    </tr>`;
+            });
+        };
+
+        const renderReportBars = () => {
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            const container = document.getElementById('report-bars-container');
+            container.innerHTML = '';
+            if(products.length === 0) {
+                container.innerHTML = `<p class="text-brand-400">Belum ada data laporan produk.</p>`;
+                return;
             }
-        }
 
-        // Handle Admin Login
-        function handleAdminLogin(e) {
+            products.forEach(p => {
+                const sold = p.sold || 0;
+                const totalIn = p.stock + sold;
+                const percentage = totalIn > 0 ? Math.round((sold / totalIn) * 100) : 0;
+
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between text-sm mb-2 font-semibold">
+                        <span class="text-brand-900">${p.name} <span class="text-xs text-brand-400 font-mono">(${p.code})</span></span>
+                        <span class="text-brand-600">Terjual: ${sold} / Stok Sisa: ${p.stock}</span>
+                    </div>
+                    <div class="w-full bg-brand-100 h-3 rounded-full overflow-hidden">
+                        <div class="bg-brand-600 h-3 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        const handleAdminAddProduct = (e) => {
             e.preventDefault();
-            const adminId = document.getElementById('admin-id').value.trim();
-            if(adminId !== '') {
-                localStorage.setItem('aros_current_admin', adminId);
-                window.location.href = 'admin.html';
-            }
-        }
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            const newProduct = {
+                id: Date.now(),
+                code: document.getElementById('inp-code').value,
+                name: document.getElementById('inp-name').value,
+                price: parseFloat(document.getElementById('inp-price').value),
+                stock: parseInt(document.getElementById('inp-stock').value),
+                sold: 0,
+                imageUrl: document.getElementById('inp-image').value,
+                sizes: [39, 40, 41, 42, 43]
+            };
+
+            products.push(newProduct);
+            localStorage.setItem('aros_products', JSON.stringify(products));
+            
+            renderAdminData();
+            showToast('Produk Berhasil Ditambahkan ke Katalog!');
+            e.target.reset();
+            showAdminMenu('admin-products');
+        };
+
+        document.addEventListener('DOMContentLoaded', renderAdminData);
     </script>
 </body>
 </html>
