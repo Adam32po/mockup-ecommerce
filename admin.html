@@ -44,7 +44,6 @@
     <!-- MODAL POP UP EDIT PRODUK -->
     <div id="edit-modal" class="fixed inset-0 bg-brand-900/60 z-50 view-hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 fade-in relative">
-            <!-- Tombol Tutup (X) -->
             <button onclick="closeEditModal()" class="absolute top-4 right-4 text-brand-400 hover:text-red-500 transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -75,6 +74,51 @@
         </div>
     </div>
     <!-- AKHIR MODAL EDIT PRODUK -->
+
+    <!-- MODAL RESTOCK / SUPLAI TOKO -->
+    <div id="restock-modal" class="fixed inset-0 bg-brand-900/60 z-50 view-hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 fade-in relative">
+            <button onclick="closeRestockModal()" class="absolute top-4 right-4 text-brand-400 hover:text-red-500 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-brand-900">Beli Suplai Toko</h3>
+                <p class="text-xs text-brand-500 mt-1">Tambah stok dari supplier dan catat modal ke pengeluaran otomatis.</p>
+                <div id="restock-product-name" class="mt-4 p-3 bg-brand-50 rounded-lg text-sm font-bold text-brand-700 border border-brand-100 text-center"></div>
+            </div>
+            
+            <form onsubmit="saveRestockData(event)" class="space-y-5">
+                <input type="hidden" id="restock-inp-id">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="restock-inp-qty" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Qty Suplai Baru</label>
+                        <input type="number" id="restock-inp-qty" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="1">
+                    </div>
+                    <div>
+                        <label for="restock-inp-sizes" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Ukuran (Pisah Koma)</label>
+                        <input type="text" id="restock-inp-sizes" class="input-minimal mt-1 font-medium text-sm" placeholder="39, 40, 41...">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="restock-inp-cost" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Total Harga Beli (Modal Pabrik)</label>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-brand-500 font-bold">Rp</span>
+                        <input type="number" id="restock-inp-cost" class="input-minimal font-bold text-brand-700 text-lg w-full" required placeholder="0" min="0">
+                    </div>
+                    <p class="text-[10px] text-red-400 mt-1 italic">*Nominal ini akan otomatis memotong laba harian toko.</p>
+                </div>
+                
+                <div class="flex gap-3 pt-4 border-t border-brand-50 mt-2">
+                    <button type="button" onclick="closeRestockModal()" class="w-full bg-brand-50 text-brand-600 px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-brand-100 transition">Batal</button>
+                    <button type="submit" class="w-full bg-emerald-500 text-white px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/30"><i class="fa-solid fa-truck-fast mr-1"></i> Simpan Suplai</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- AKHIR MODAL RESTOCK / SUPLAI -->
 
     <div class="min-h-screen flex flex-col md:flex-row relative z-10">
         <!-- Sidebar -->
@@ -180,7 +224,7 @@
                 <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-brand-50 text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
-                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga</th><th class="p-4 font-semibold">Stok & Ukuran Tersedia</th><th class="p-4 font-semibold">Aksi / Terjual</th></tr>
+                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga Jual</th><th class="p-4 font-semibold">Stok & Ukuran Tersedia</th><th class="p-4 font-semibold">Aksi / Terjual</th></tr>
                         </thead>
                         <tbody id="admin-product-table-body" class="divide-y divide-brand-50"></tbody>
                     </table>
@@ -190,19 +234,19 @@
             <!-- Input Barang -->
             <div id="admin-input" class="admin-section view-hidden fade-in">
                 <div class="max-w-2xl bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
-                    <h3 class="text-2xl font-bold mb-6 text-brand-600">Tambah Produk Baru</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-brand-600">Tambah Produk Baru (Master Data)</h3>
                     <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
                         <div class="grid grid-cols-2 gap-6">
                             <div><label for="inp-code" class="text-xs uppercase tracking-widest text-brand-500">Kode Sepatu</label><input type="text" id="inp-code" class="input-minimal mt-2" required placeholder="AR-001"></div>
-                            <div><label for="inp-price" class="text-xs uppercase tracking-widest text-brand-500">Harga (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
+                            <div><label for="inp-price" class="text-xs uppercase tracking-widest text-brand-500">Harga Jual (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
                         </div>
                         <div><label for="inp-name" class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
                         <div class="grid grid-cols-2 gap-6">
-                            <div><label for="inp-stock" class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
+                            <div><label for="inp-stock" class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok Awal</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
                             <div><label for="inp-sizes" class="text-xs uppercase tracking-widest text-brand-500">Ukuran Tersedia (Pisah Koma)</label><input type="text" id="inp-sizes" class="input-minimal mt-2" required placeholder="39, 40, 41, 42, 43"></div>
                         </div>
                         <div><label for="inp-image" class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
-                        <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan & Sinkronisasi</button>
+                        <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan Ke Katalog</button>
                     </form>
                 </div>
             </div>
@@ -275,7 +319,7 @@
             <!-- Laporan Harian -->
             <div id="admin-daily" class="admin-section view-hidden fade-in">
                 <h3 class="text-2xl font-bold mb-2">Laporan Finansial Harian</h3>
-                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko. Masukkan pengeluaran secara manual (Contoh: Tarik tunai/Beli stok).</p>
+                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko. Masukkan pengeluaran selain suplai secara manual (Contoh: Listrik / Gaji).</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
                         <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Pemasukan (Kotor)</p>
@@ -348,12 +392,10 @@
 
             document.getElementById('stat-total-product').innerText = products.length;
             
-            // Total Terjual didapat dari data katalog yang sudah disesuaikan dengan pesanan (termasuk jika batal)
             let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
             document.getElementById('stat-total-sold').innerText = totalSold;
             document.getElementById('stat-active-users').innerText = customers.length;
 
-            // Filter pesanan dibatalkan agar tidak masuk perhitungan uang
             let validOrders = orders.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
             let totalIncome = validOrders.reduce((acc, o) => acc + o.total, 0); 
             let netProfit = totalIncome - savedExpense; 
@@ -408,8 +450,8 @@
                                 <i class="fa-solid fa-pen"></i> Edit
                             </button>
                             
-                            <button onclick="restockProduct(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Tambah Stok & Perbarui Ukuran">
-                                <i class="fa-solid fa-plus"></i> Restock
+                            <button onclick="openRestockModal(${p.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Beli Suplai Barang">
+                                <i class="fa-solid fa-truck-fast"></i> Suplai
                             </button>
                             
                             <button onclick="deleteProduct(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Hapus Produk">
@@ -465,33 +507,67 @@
                 }
             }
         };
-        /* ================================================================= */
 
-        const restockProduct = (id) => {
+        /* ================= FUNGSI UNTUK MODAL RESTOCK / SUPLAI ================= */
+        const openRestockModal = (id) => {
             let products = JSON.parse(localStorage.getItem('aros_products')) || [];
             let p = products.find(prod => prod.id === id);
+            
             if(p) {
-                let addQty = prompt(`Masukkan jumlah stok tambahan untuk "${p.name}":`, "10");
-                if(addQty !== null) {
-                    let qtyNum = parseInt(addQty);
-                    if(!isNaN(qtyNum) && qtyNum > 0) {
-                        let currentSizesStr = p.sizes ? p.sizes.join(', ') : '39, 40, 41, 42, 43';
-                        let newSizesStr = prompt(`Perbarui ukuran tersedia (pisahkan dengan koma):`, currentSizesStr);
-                        
-                        p.stock += qtyNum;
-                        if(newSizesStr !== null && newSizesStr.trim() !== '') {
-                            p.sizes = newSizesStr.split(',').map(s => s.trim()).filter(Boolean);
-                        }
-
-                        localStorage.setItem('aros_products', JSON.stringify(products));
-                        renderAdminData();
-                        showToast(`Stok & ukuran ${p.name} berhasil diperbarui! Produk kembali aktif.`);
-                    } else {
-                        alert('Jumlah stok yang dimasukkan tidak valid!');
-                    }
-                }
+                document.getElementById('restock-inp-id').value = p.id;
+                document.getElementById('restock-product-name').innerText = p.name;
+                document.getElementById('restock-inp-qty').value = '';
+                document.getElementById('restock-inp-cost').value = '';
+                document.getElementById('restock-inp-sizes').value = p.sizes ? p.sizes.join(', ') : '39, 40, 41, 42, 43';
+                
+                document.getElementById('restock-modal').classList.remove('view-hidden');
             }
         };
+
+        const closeRestockModal = () => {
+            document.getElementById('restock-modal').classList.add('view-hidden');
+        };
+
+        const saveRestockData = (e) => {
+            e.preventDefault();
+            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let idToEdit = parseInt(document.getElementById('restock-inp-id').value);
+            let qty = parseInt(document.getElementById('restock-inp-qty').value);
+            let cost = parseInt(document.getElementById('restock-inp-cost').value);
+            let sizesStr = document.getElementById('restock-inp-sizes').value;
+
+            let productIndex = products.findIndex(prod => prod.id === idToEdit);
+            
+            if(productIndex !== -1 && !isNaN(qty) && qty > 0) {
+                // 1. Tambah Stok Katalog
+                products[productIndex].stock += qty;
+                if(sizesStr.trim() !== '') {
+                    products[productIndex].sizes = sizesStr.split(',').map(s => s.trim()).filter(Boolean);
+                }
+                localStorage.setItem('aros_products', JSON.stringify(products));
+
+                // 2. Catat Otomatis ke Pengeluaran Finansial
+                if (!isNaN(cost) && cost > 0) {
+                    let expensesArr = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
+                    const todayStr = new Date().toLocaleDateString();
+                    expensesArr.push({ 
+                        date: todayStr, 
+                        amount: cost, 
+                        timestamp: Date.now(),
+                        note: `Suplai Barang: ${products[productIndex].name} (${qty} pcs)`
+                    });
+                    localStorage.setItem('aros_daily_expenses', JSON.stringify(expensesArr));
+                    
+                    let currentSavedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
+                    localStorage.setItem('aros_expenses', currentSavedExpense + cost);
+                }
+
+                closeRestockModal();
+                renderAdminData(); // Refresh keseluruhan dashboard, katalog, dan finansial
+                showToast(`Suplai ${products[productIndex].name} berhasil ditambahkan!`);
+            }
+        };
+        /* ======================================================================= */
 
         const deleteProduct = (id) => {
             let products = JSON.parse(localStorage.getItem('aros_products')) || [];
@@ -520,7 +596,6 @@
             let ordersHist = JSON.parse(localStorage.getItem('aros_orders')) || [];
             let expensesHist = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
 
-            // Pastikan pemasukan tidak menghitung pesanan dibatalkan
             const validOrdersHist = ordersHist.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
             
             const incomeToday = validOrdersHist.filter(o => o.date === todayStr).reduce((acc, o) => acc + o.total, 0);
@@ -578,7 +653,7 @@
                 let expensesArr = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
                 const todayStr = new Date().toLocaleDateString();
                 
-                expensesArr.push({ date: todayStr, amount: newExpenseAmt, timestamp: Date.now() });
+                expensesArr.push({ date: todayStr, amount: newExpenseAmt, timestamp: Date.now(), note: "Manual Input" });
                 localStorage.setItem('aros_daily_expenses', JSON.stringify(expensesArr));
                 
                 savedExpense += newExpenseAmt;
@@ -645,24 +720,20 @@
             showToast('Status pengiriman berhasil diperbarui!');
         };
 
-        // Fungsi baru untuk menangani status dengan fitur pembatalan pesanan
         const handleStatusChange = (index, newStatus) => {
             if (newStatus === 'Pesanan Dibatalkan') {
                 let reason = prompt("Masukkan alasan pembatalan (misal: kurir bermasalah, salah pesanan, stok kosong):");
                 
-                // Jika admin tekan Cancel atau tidak mengisi, batalkan perubahan status
                 if (reason === null || reason.trim() === '') {
-                    renderOrdersTable(); // Kembalikan tampilan dropdown ke status semula
+                    renderOrdersTable(); 
                     return;
                 }
                 
-                // 1. Simpan pembatalan di pesanan
                 orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
                 let order = orders[index];
                 order.status = `Pesanan Dibatalkan - ${reason}`;
                 localStorage.setItem('aros_orders', JSON.stringify(orders));
                 
-                // 2. Kembalikan jumlah stok produk dan kurangi angka terjual (Restock Otomatis)
                 let prods = JSON.parse(localStorage.getItem('aros_products')) || [];
                 if(order.items && order.items.length > 0) {
                     order.items.forEach(item => {
@@ -677,8 +748,8 @@
                 }
                 
                 showToast('Pesanan dibatalkan & Stok barang dikembalikan otomatis!');
-                renderAdminData(); // Refresh UI dashboard (pendapatan dikurangi otomatis)
-                renderOrdersTable(); // Refresh tabel pesanan
+                renderAdminData(); 
+                renderOrdersTable(); 
             } else {
                 updateOrderStatus(index, newStatus);
             }
@@ -694,7 +765,6 @@
                 return;
             }
             
-            // Tambahkan "Pesanan Dibatalkan" di pilihan
             const statusOptions = ['Sedang Dikemas', 'Diserahkan ke Logistik', 'Kurir Menuju Lokasi', 'Pesanan Selesai', 'Pesanan Dibatalkan'];
 
             [...orders].reverse().forEach((o, reversedIndex) => {
@@ -706,7 +776,6 @@
                 let isCancelled = currentStatus.startsWith('Pesanan Dibatalkan');
                 let selectHTML = '';
                 
-                // Jika sudah dibatalkan, kunci status menjadi tulisan label dengan info alasannya
                 if (isCancelled) {
                     let reasonText = currentStatus.replace('Pesanan Dibatalkan - ', '');
                     selectHTML = `
