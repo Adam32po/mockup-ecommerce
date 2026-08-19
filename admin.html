@@ -1,895 +1,895 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AROS - Admin Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <script>
-        tailwind.config = {
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' } }
-                } 
-            }
-        }
-    </script>
-
-    <style>
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f0f9ff; }
-        ::-webkit-scrollbar-thumb { background: #0284c7; }
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .input-minimal { width: 100%; border: none; border-bottom: 1px solid #bae6fd; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #0c4a6e;}
-        .input-minimal:focus { border-bottom-color: #0284c7; }
-        .view-hidden { display: none !important; }
-
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AROS - Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' } }
+                } 
+            }
+        }
+    </script>
+    
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f9ff; }
+        ::-webkit-scrollbar-thumb { background: #0284c7; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .input-minimal { width: 100%; border: none; border-bottom: 1px solid #bae6fd; border-radius: 0; padding: 10px 0; outline: none; background: transparent; transition: border-color 0.3s; color: #0c4a6e;}
+        .input-minimal:focus { border-bottom-color: #0284c7; }
+        .view-hidden { display: none !important; }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
 </head>
 <body class="font-sans bg-brand-50 text-brand-900 antialiased">
 
-    <!-- Notifikasi (Toast) -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-brand-600 text-white px-6 py-3 rounded-lg shadow-lg shadow-brand-500/30 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
-        <i class="fa-solid fa-check-circle"></i>
-        <span id="toast-message">Notifikasi</span>
-    </div>
-
-    <!-- MODAL POP UP EDIT PRODUK -->
-    <div id="edit-modal" class="fixed inset-0 bg-brand-900/60 z-50 view-hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
-        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 fade-in relative">
-            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-brand-400 hover:text-red-500 transition">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold text-brand-900">Edit Info Produk</h3>
-                <p class="text-xs text-brand-500 mt-1">Ubah rincian nama atau harga untuk katalog ini.</p>
-            </div>
-
-            <form onsubmit="saveEditedProduct(event)" class="space-y-6">
-                <input type="hidden" id="edit-inp-id">
-
-                <div>
-                    <label for="edit-inp-name" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Nama Sepatu</label>
-                    <input type="text" id="edit-inp-name" class="input-minimal mt-2 font-medium" required placeholder="Contoh: AROS Runner Pro">
-                </div>
-
-                <div>
-                    <label for="edit-inp-price" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Harga Jual (Rp)</label>
-                    <input type="number" id="edit-inp-price" class="input-minimal mt-2 font-medium" required placeholder="Contoh: 1200000">
-                </div>
-
-                <div class="flex gap-3 pt-4 border-t border-brand-50">
-                    <button type="button" onclick="closeEditModal()" class="w-full bg-brand-50 text-brand-600 px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-brand-100 transition">Batal</button>
-                    <button type="submit" class="w-full bg-amber-500 text-white px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-amber-600 transition shadow-lg shadow-amber-500/30">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- AKHIR MODAL EDIT PRODUK -->
-
-    <!-- MODAL RESTOCK / SUPLAI TOKO (DENGAN HITUNG OTOMATIS) -->
-    <div id="restock-modal" class="fixed inset-0 bg-brand-900/60 z-50 view-hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
-        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 fade-in relative">
-            <button onclick="closeRestockModal()" class="absolute top-4 right-4 text-brand-400 hover:text-red-500 transition">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold text-brand-900">Beli Suplai Toko</h3>
-                <p class="text-xs text-brand-500 mt-1">Sistem akan otomatis menghitung total modal pengeluaranmu.</p>
-                <div id="restock-product-name" class="mt-4 p-3 bg-brand-50 rounded-lg text-sm font-bold text-brand-700 border border-brand-100 text-center"></div>
-            </div>
-
-            <form onsubmit="saveRestockData(event)" class="space-y-4">
-                <input type="hidden" id="restock-inp-id">
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="restock-inp-qty" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Qty Suplai Baru</label>
-                        <input type="number" id="restock-inp-qty" oninput="calculateTotalRestock()" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="1">
-                    </div>
-                    <div>
-                        <label for="restock-inp-unit-cost" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Modal per Pasang (Rp)</label>
-                        <input type="number" id="restock-inp-unit-cost" oninput="calculateTotalRestock()" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="0">
-                    </div>
-                </div>
-
-                <div>
-                    <label for="restock-inp-sizes" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Ukuran Tersedia (Pisah Koma)</label>
-                    <input type="text" id="restock-inp-sizes" class="input-minimal mt-1 font-medium text-sm" placeholder="39, 40, 41...">
-                </div>
-
-                <div class="mt-2">
-                    <label class="text-xs uppercase tracking-widest text-brand-500 font-bold">Total Harga Beli (Otomatis)</label>
-                    <div class="flex justify-between items-center bg-red-50 border border-red-100 rounded-xl p-4 mt-2">
-                        <span class="text-xs text-red-500 font-bold uppercase tracking-widest">Total:</span>
-                        <span id="restock-display-total" class="text-2xl font-black text-red-600">Rp 0</span>
-                    </div>
-                    <!-- Input tersembunyi ini yang akan menyimpan nilai hitungan untuk database -->
-                    <input type="hidden" id="restock-inp-total-cost" value="0">
-                    <p class="text-[10px] text-red-400 mt-1 italic">*Nominal ini akan otomatis memotong laba harian toko sebagai pengeluaran.</p>
-                </div>
-
-                <div class="flex gap-3 pt-4 border-t border-brand-50 mt-4">
-                    <button type="button" onclick="closeRestockModal()" class="w-full bg-brand-50 text-brand-600 px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-brand-100 transition">Batal</button>
-                    <button type="submit" class="w-full bg-emerald-500 text-white px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/30"><i class="fa-solid fa-truck-fast mr-1"></i> Simpan Suplai</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- AKHIR MODAL RESTOCK / SUPLAI -->
-
-    <div class="min-h-screen flex flex-col md:flex-row relative z-10">
-        <!-- Sidebar -->
-        <aside class="w-full md:w-64 bg-white border-r border-brand-100 flex flex-col shadow-sm">
-            <div class="p-8 border-b border-brand-100 bg-brand-900 text-white relative overflow-hidden">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmcHqbGY0tJyyxBrlWjlFFx9BCd96X2maGL6mhyv2Wzw&s=10" class="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-overlay">
-                <div class="absolute inset-0 bg-brand-900/80 z-0"></div>
-
-                <div class="relative z-10">
-                    <h2 class="text-2xl font-bold tracking-tighter">AROS</h2>
-                    <p class="text-xs uppercase tracking-widest text-brand-100 mt-1">Admin Panel</p>
-                </div>
-
-                <div class="relative z-10 mt-6 pt-5 border-t border-brand-700 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm shadow-inner">
-                        <i class="fa-solid fa-user-shield"></i>
-                    </div>
-                    <div>
-                        <p id="sidebar-admin-name" class="text-sm font-bold text-white leading-tight">Admin</p>
-                        <p id="sidebar-admin-id" class="text-[10px] text-brand-200 font-mono mt-0.5 uppercase tracking-widest">ID: -</p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="flex-1 p-4 space-y-2">
-                <button onclick="showAdminMenu('admin-dash')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors font-medium">Dashboard</button>
-                <button onclick="showAdminMenu('admin-products')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Katalog Produk</button>
-                <button onclick="showAdminMenu('admin-input')" class="w-full text-left px-4 py-3 rounded text-sm bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors font-semibold shadow-sm">+ Input Barang</button>
-                <button onclick="showAdminMenu('admin-history')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">History Akun</button>
-                <button onclick="showAdminMenu('admin-customers')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Data Pelanggan</button>
-                <button onclick="showAdminMenu('admin-reports')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Produk</button>
-                <button onclick="showAdminMenu('admin-daily')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Harian</button>
-            </nav>
-            <div class="p-4 border-t border-brand-100">
-                <a href="index.html" class="block w-full text-center px-4 py-3 text-sm text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors font-semibold"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out</a>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-8 md:p-12 overflow-y-auto">
-
-            <!-- Dashboard -->
-            <div id="admin-dash" class="admin-section fade-in">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-                    <div>
-                        <h3 class="text-2xl font-bold mb-1 text-brand-900">Overview Kinerja</h3>
-                        <p class="text-brand-500 text-sm">Data real-time toko.</p>
-                    </div>
-
-                    <div class="bg-white px-5 py-2.5 rounded-xl border border-brand-100 shadow-sm flex items-center gap-3">
-                        <div class="text-right">
-                            <p class="text-xs text-brand-500 font-medium">Logged in as</p>
-                            <p class="text-sm font-bold text-brand-700 leading-tight" id="dash-admin-name">Admin</p>
-                        </div>
-                        <div class="w-9 h-9 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100">
-                            <i class="fa-solid fa-id-badge"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
-                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Produk</p>
-                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-product">0</h4>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
-                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Terjual</p>
-                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-sold">0</h4>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
-                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">User Aktif</p>
-                        <h4 class="text-4xl font-bold text-emerald-600" id="stat-active-users">0</h4>
-                    </div>
-                    <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-brand-600 to-brand-900 text-white flex flex-col justify-center">
-                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2">Pendapatan Bersih</p>
-                        <h4 class="text-2xl font-bold" id="stat-total-revenue">Rp 0</h4>
-                    </div>
-                </div>
-
-                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h4 class="text-lg font-bold text-brand-900"><i class="fa-solid fa-chart-bar mr-2 text-brand-600"></i> Statistik Keuangan (3 Hari)</h4>
-                            <p class="text-xs text-brand-500 mt-1">Perbandingan arus kas pemasukan dan pengeluaran secara real-time berdasarkan riwayat.</p>
-                        </div>
-                        <div class="flex items-center gap-4 text-xs font-semibold">
-                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-brand-600 rounded-sm inline-block"></span> Pemasukan</span>
-                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-red-400 rounded-sm inline-block"></span> Pengeluaran</span>
-                        </div>
-                    </div>
-                    <div id="financial-bars-container" class="space-y-6"></div>
-                </div>
-            </div>
-
-            <!-- Katalog Produk -->
-            <div id="admin-products" class="admin-section view-hidden fade-in">
-                <div class="flex justify-between items-center mb-8">
-                    <div>
-                        <h3 class="text-2xl font-bold">Katalog Produk AROS</h3>
-                        <p class="text-xs text-brand-500 mt-1">Kelola stok, ukuran, status, dan data produk secara real-time.</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-brand-50 text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
-                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga Jual</th><th class="p-4 font-semibold">Stok & Ukuran Tersedia</th><th class="p-4 font-semibold">Aksi / Terjual</th></tr>
-                        </thead>
-                        <tbody id="admin-product-table-body" class="divide-y divide-brand-50"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Input Barang -->
-            <div id="admin-input" class="admin-section view-hidden fade-in">
-                <div class="max-w-2xl bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
-                    <h3 class="text-2xl font-bold mb-6 text-brand-600">Tambah Produk Baru (Master Data)</h3>
-                    <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div><label for="inp-code" class="text-xs uppercase tracking-widest text-brand-500">Kode Sepatu</label><input type="text" id="inp-code" class="input-minimal mt-2" required placeholder="AR-001"></div>
-                            <div><label for="inp-price" class="text-xs uppercase tracking-widest text-brand-500">Harga Jual (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
-                        </div>
-                        <div><label for="inp-name" class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
-                        <div class="grid grid-cols-2 gap-6">
-                            <div><label for="inp-stock" class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok Awal</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
-                            <div><label for="inp-sizes" class="text-xs uppercase tracking-widest text-brand-500">Ukuran Tersedia (Pisah Koma)</label><input type="text" id="inp-sizes" class="input-minimal mt-2" required placeholder="39, 40, 41, 42, 43"></div>
-                        </div>
-                        <div><label for="inp-image" class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
-                        <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan Ke Katalog</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- History Akun Customer -->
-            <div id="admin-history" class="admin-section view-hidden fade-in">
-                <div class="flex justify-between items-end mb-8">
-                    <div>
-                        <h3 class="text-2xl font-bold text-brand-900">Manajemen Akun Customer</h3>
-                        <p class="text-brand-500 text-sm mt-1">Data sinkronisasi dari pendaftaran sistem utama.</p>
-                    </div>
-                    <div class="bg-brand-100 text-brand-700 px-4 py-2 rounded-lg font-bold text-sm">
-                        Total Pendaftar: <span id="stat-total-users">0</span> Akun
-                    </div>
-                </div>
-
-                <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Pendaftaran Terbaru</h4>
-                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-4 mb-10">
-                    <table class="w-full text-left text-sm">
-                        <thead class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-brand-50">
-                            <tr><th class="p-3">Nickname</th><th class="p-3">Email</th><th class="p-3">Kapan Ditambahkan</th></tr>
-                        </thead>
-                        <tbody id="admin-recent-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
-                    </table>
-                </div>
-
-                <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-users mr-2"></i> Daftar Seluruh Akun</h4>
-                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
-                    <table class="w-full text-left text-sm">
-                        <thead class="text-[11px] uppercase tracking-widest text-brand-600 border-b border-brand-100">
-                            <tr>
-                                <th class="p-3">Nama Lengkap</th>
-                                <th class="p-3">Username / Nickname</th>
-                                <th class="p-3">Alamat Email</th>
-                                <th class="p-3">Tanggal Daftar</th>
-                                <th class="p-3">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-full-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Data Pelanggan (Transaksi & Pengiriman) -->
-            <div id="admin-customers" class="admin-section view-hidden fade-in">
-                <h3 class="text-2xl font-bold mb-8">Data Transaksi & Pengiriman</h3>
-                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
-                    <table class="w-full text-left text-sm">
-                        <thead class="text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
-                            <tr>
-                                <th class="p-3">ID Pesanan</th>
-                                <th class="p-3">Info Pembeli</th>
-                                <th class="p-3">Produk Dibeli</th>
-                                <th class="p-3">Pembayaran</th>
-                                <th class="p-3">Status Pengiriman</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-orders-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Laporan Produk -->
-            <div id="admin-reports" class="admin-section view-hidden fade-in">
-                <h3 class="text-2xl font-bold mb-2">Laporan & Statistik Produk</h3>
-                <p class="text-brand-500 mb-8">Perbandingan stok masuk dengan volume produk keluar.</p>
-                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm space-y-8 max-w-3xl" id="report-bars-container"></div>
-            </div>
-
-            <!-- Laporan Harian -->
-            <div id="admin-daily" class="admin-section view-hidden fade-in">
-                <h3 class="text-2xl font-bold mb-2">Laporan Finansial Harian</h3>
-                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko. Masukkan pengeluaran selain suplai secara manual (Contoh: Listrik / Gaji).</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
-                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Pemasukan (Kotor)</p>
-                        <h4 class="text-2xl font-bold text-brand-600" id="daily-income">Rp 0</h4>
-                    </div>
-
-                    <div class="bg-white p-5 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="text-xs uppercase tracking-widest text-brand-500">Catat Pengeluaran Baru</p>
-                            <p class="text-[10px] text-brand-400">Total: <span id="total-expense-display" class="font-bold text-red-500">Rp 0</span></p>
-                        </div>
-                        <div class="flex items-center gap-2 border-b-2 border-brand-100 focus-within:border-red-400 transition-colors pb-1">
-                            <span class="text-red-500 font-bold">Rp</span>
-                            <input type="number" id="inp-expense" class="w-full outline-none text-lg font-bold text-red-500 bg-transparent placeholder-red-300" placeholder="0">
-                            <button onclick="saveExpenseData()" class="bg-brand-50 hover:bg-brand-100 text-brand-600 px-3 py-1.5 rounded-lg text-xs font-bold transition ml-auto shadow-sm">Catat</button>
-                        </div>
-                    </div>
-
-                    <div class="p-6 rounded-xl shadow-md bg-brand-600 text-white flex flex-col justify-center relative overflow-hidden">
-                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-brand-500 rounded-full opacity-50 blur-xl"></div>
-                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2 relative z-10">Total Laba Bersih</p>
-                        <h4 class="text-2xl font-bold relative z-10" id="daily-profit">Rp 0</h4>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <script>
-        let products = [];
-        let customers = [];
-        let orders = [];
-        let savedExpense = 0;
-
-        const initAdminProfile = () => {
-            const currentAdminName = localStorage.getItem('aros_current_admin') || 'Super Admin';
-            const admins = JSON.parse(localStorage.getItem('aros_admins')) || [];
-            const currentAdminData = admins.find(a => a.name === currentAdminName) || { id: 'admin', name: currentAdminName };
-
-            document.getElementById('sidebar-admin-name').innerText = currentAdminData.name;
-            document.getElementById('sidebar-admin-id').innerText = `ID: ${currentAdminData.id}`;
-            document.getElementById('dash-admin-name').innerText = currentAdminData.name;
-        };
-
-        const showToast = (msg) => {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
-        };
-
-        const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
-
-        const showAdminMenu = (sectionId) => {
-            document.querySelectorAll('.admin-section').forEach(el => el.classList.add('view-hidden'));
-            document.getElementById(sectionId).classList.remove('view-hidden');
-
-            renderAdminData();
-            if(sectionId === 'admin-reports') renderReportBars();
-            if(sectionId === 'admin-history') renderHistoryTables();
-            if(sectionId === 'admin-customers') renderOrdersTable();
-        };
-
-        const renderAdminData = () => {
-            products = JSON.parse(localStorage.getItem('aros_products')) || [];
-            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
-            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
-            savedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
-
-            document.getElementById('stat-total-product').innerText = products.length;
-
-            let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
-            document.getElementById('stat-total-sold').innerText = totalSold;
-            document.getElementById('stat-active-users').innerText = customers.length;
-
-            let validOrders = orders.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
-            let totalIncome = validOrders.reduce((acc, o) => acc + o.total, 0); 
-            let netProfit = totalIncome - savedExpense; 
-
-            document.getElementById('daily-income').innerText = formatRupiah(totalIncome);
-
-            const expDisplay = document.getElementById('total-expense-display');
-            if (expDisplay) expDisplay.innerText = formatRupiah(savedExpense);
-
-            const profitEl = document.getElementById('daily-profit');
-            profitEl.innerText = formatRupiah(netProfit);
-            profitEl.className = netProfit < 0 ? "text-2xl font-bold relative z-10 text-red-200" : "text-2xl font-bold relative z-10 text-white";
-
-            document.getElementById('stat-total-revenue').innerText = formatRupiah(netProfit);
-
-            renderFinancialBars(totalIncome, savedExpense);
-
-            const tbody = document.getElementById('admin-product-table-body');
-            tbody.innerHTML = '';
-
-            if(products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-brand-400">Belum ada produk. Silakan tambah barang baru di menu "+ Input Barang".</td></tr>`;
-                return;
-            }
-
-            products.forEach(p => {
-                const isSoldOut = (p.stock === 0 || p.stock === undefined);
-                const sizesText = p.sizes ? p.sizes.join(', ') : '-';
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-brand-50 transition-colors";
-
-                tr.innerHTML = `
-                    <td class="p-4 flex items-center gap-4">
-                        <img src="${p.imageUrl}" class="w-12 h-12 rounded-lg object-cover bg-brand-100 shadow-sm">
-                        <div><p class="font-bold text-brand-900">${p.name}</p><p class="text-xs text-brand-500 font-mono">${p.code}</p></div>
-                    </td>
-                    <td class="p-4 font-medium">${formatRupiah(p.price)}</td>
-                    <td class="p-4">
-                        <div class="flex flex-col gap-1">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span>
-                                ${isSoldOut ? '<span class="bg-red-100 text-red-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Terkunci (Habis)</span>' : '<span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Aktif / Tersedia</span>'}
-                            </div>
-                            <span class="text-[11px] text-brand-500">Ukuran: <b>${sizesText}</b></span>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="font-medium text-brand-600 mr-2">${p.sold || 0} terjual</span>
-
-                            <button onclick="openEditModal(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Edit Nama & Harga">
-                                <i class="fa-solid fa-pen"></i> Edit
-                            </button>
-
-                            <button onclick="openRestockModal(${p.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Beli Suplai Barang">
-                                <i class="fa-solid fa-truck-fast"></i> Suplai
-                            </button>
-
-                            <button onclick="deleteProduct(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Hapus Produk">
-                                <i class="fa-solid fa-trash"></i> Hapus
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        };
-
-        /* ================= FUNGSI UNTUK MODAL EDIT PRODUK ================= */
-        const openEditModal = (id) => {
-            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
-            let p = products.find(prod => prod.id === id);
-
-            if(p) {
-                document.getElementById('edit-inp-id').value = p.id;
-                document.getElementById('edit-inp-name').value = p.name;
-                document.getElementById('edit-inp-price').value = p.price;
-
-                document.getElementById('edit-modal').classList.remove('view-hidden');
-            }
-        };
-
-        const closeEditModal = () => {
-            document.getElementById('edit-modal').classList.add('view-hidden');
-        };
-
-        const saveEditedProduct = (e) => {
-            e.preventDefault();
-
-            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
-            let idToEdit = parseInt(document.getElementById('edit-inp-id').value);
-            let newName = document.getElementById('edit-inp-name').value.trim();
-            let newPrice = parseFloat(document.getElementById('edit-inp-price').value);
-
-            let productIndex = products.findIndex(prod => prod.id === idToEdit);
-
-            if (productIndex !== -1) {
-                if (newName !== '' && !isNaN(newPrice) && newPrice >= 0) {
-                    products[productIndex].name = newName;
-                    products[productIndex].price = newPrice;
-
-                    localStorage.setItem('aros_products', JSON.stringify(products));
-                    renderAdminData();
-                    showToast(`Info ${newName} berhasil diperbarui!`);
-
-                    closeEditModal();
-                } else {
-                    alert("Harap pastikan nama dan harga sudah diisi dengan benar.");
-                }
-            }
-        };
-
-        /* ================= FUNGSI UNTUK MODAL RESTOCK / SUPLAI ================= */
-        // Fungsi baru untuk Kalkulator Otomatis
-        const calculateTotalRestock = () => {
-            const qty = parseInt(document.getElementById('restock-inp-qty').value) || 0;
-            const unitCost = parseInt(document.getElementById('restock-inp-unit-cost').value) || 0;
-            const total = qty * unitCost;
-
-            // Masukkan ke input tersembunyi (untuk diproses JS)
-            document.getElementById('restock-inp-total-cost').value = total;
-            // Tampilkan di teks yang bagus secara visual
-            document.getElementById('restock-display-total').innerText = formatRupiah(total);
-        };
-
-        const openRestockModal = (id) => {
-            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
-            let p = products.find(prod => prod.id === id);
-
-            if(p) {
-                document.getElementById('restock-inp-id').value = p.id;
-                document.getElementById('restock-product-name').innerText = p.name;
-
-                // Reset semua input saat modal dibuka
-                document.getElementById('restock-inp-qty').value = '';
-                document.getElementById('restock-inp-unit-cost').value = '';
-                document.getElementById('restock-inp-total-cost').value = '0';
-                document.getElementById('restock-display-total').innerText = 'Rp 0';
-                document.getElementById('restock-inp-sizes').value = p.sizes ? p.sizes.join(', ') : '39, 40, 41, 42, 43';
-
-                document.getElementById('restock-modal').classList.remove('view-hidden');
-            }
-        };
-
-        const closeRestockModal = () => {
-            document.getElementById('restock-modal').classList.add('view-hidden');
-        };
-
-        const saveRestockData = (e) => {
-            e.preventDefault();
-            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
-            let idToEdit = parseInt(document.getElementById('restock-inp-id').value);
-            let qty = parseInt(document.getElementById('restock-inp-qty').value);
-            let cost = parseInt(document.getElementById('restock-inp-total-cost').value); // Ambil dari hasil hitung otomatis
-            let sizesStr = document.getElementById('restock-inp-sizes').value;
-
-            let productIndex = products.findIndex(prod => prod.id === idToEdit);
-
-            if(productIndex !== -1 && !isNaN(qty) && qty > 0) {
-                // 1. Tambah Stok Katalog
-                products[productIndex].stock += qty;
-                if(sizesStr.trim() !== '') {
-                    products[productIndex].sizes = sizesStr.split(',').map(s => s.trim()).filter(Boolean);
-                }
-                localStorage.setItem('aros_products', JSON.stringify(products));
-
-                // 2. Catat Otomatis ke Pengeluaran Finansial
-                if (!isNaN(cost) && cost > 0) {
-                    let expensesArr = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
-                    const todayStr = new Date().toLocaleDateString();
-                    expensesArr.push({ 
-                        date: todayStr, 
-                        amount: cost, 
-                        timestamp: Date.now(),
-                        note: `Suplai Barang: ${products[productIndex].name} (${qty} pcs)`
-                    });
-                    localStorage.setItem('aros_daily_expenses', JSON.stringify(expensesArr));
-
-                    let currentSavedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
-                    localStorage.setItem('aros_expenses', currentSavedExpense + cost);
-                }
-
-                closeRestockModal();
-                renderAdminData(); // Refresh keseluruhan dashboard, katalog, dan finansial
-                showToast(`Suplai ${products[productIndex].name} berhasil ditambahkan!`);
-            }
-        };
-        /* ======================================================================= */
-
-        const deleteProduct = (id) => {
-            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
-            let p = products.find(prod => prod.id === id);
-            if(p) {
-                if(confirm(`Apakah Anda yakin ingin menghapus produk "${p.name}" dari katalog?`)) {
-                    products = products.filter(prod => prod.id !== id);
-                    localStorage.setItem('aros_products', JSON.stringify(products));
-                    renderAdminData();
-                    showToast('Produk berhasil dihapus dari katalog!');
-                }
-            }
-        };
-
-        const renderFinancialBars = (totalIncome, totalExpense) => {
-            const container = document.getElementById('financial-bars-container');
-            container.innerHTML = '';
-
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-
-            const todayStr = today.toLocaleDateString();
-            const yesterdayStr = yesterday.toLocaleDateString();
-
-            let ordersHist = JSON.parse(localStorage.getItem('aros_orders')) || [];
-            let expensesHist = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
-
-            const validOrdersHist = ordersHist.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
-
-            const incomeToday = validOrdersHist.filter(o => o.date === todayStr).reduce((acc, o) => acc + o.total, 0);
-            const incomeYesterday = validOrdersHist.filter(o => o.date === yesterdayStr).reduce((acc, o) => acc + o.total, 0);
-
-            const incomeTomorrow = Math.round((incomeToday + incomeYesterday) / 2) || 0; 
-
-            const expenseToday = expensesHist.filter(e => e.date === todayStr).reduce((acc, e) => acc + e.amount, 0);
-            const expenseYesterday = expensesHist.filter(e => e.date === yesterdayStr).reduce((acc, e) => acc + e.amount, 0);
-            const expenseTomorrow = Math.round((expenseToday + expenseYesterday) / 2) || 0;
-
-            const daysData = [
-                { label: 'Kemarin', income: incomeYesterday, expense: expenseYesterday },
-                { label: 'Hari Ini', income: incomeToday, expense: expenseToday },
-                { label: 'Esok (Estimasi)', income: incomeTomorrow, expense: expenseTomorrow }
-            ];
-
-            const maxVal = Math.max(...daysData.map(d => Math.max(d.income, d.expense)), 100000);
-
-            daysData.forEach(d => {
-                const incPercent = Math.min(100, (d.income / maxVal) * 100);
-                const expPercent = Math.min(100, (d.expense / maxVal) * 100);
-
-                const row = document.createElement('div');
-                row.className = 'border-b border-brand-50 pb-4 last:border-none last:pb-0';
-                row.innerHTML = `
-                    <div class="flex justify-between items-center mb-2 text-xs font-bold uppercase tracking-widest text-brand-700">
-                        <span>${d.label}</span>
-                        <span class="text-brand-500 font-normal">Pemasukan: <strong class="text-brand-700">${formatRupiah(d.income)}</strong> | Pengeluaran: <strong class="text-red-500">${formatRupiah(d.expense)}</strong></span>
-                    </div>
-                    <div class="space-y-2">
-                        <div>
-                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pemasukan</span><span>${formatRupiah(d.income)}</span></div>
-                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
-                                <div class="bg-brand-600 h-2.5 rounded-full transition-all duration-500" style="width: ${incPercent}%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pengeluaran</span><span>${formatRupiah(d.expense)}</span></div>
-                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
-                                <div class="bg-red-400 h-2.5 rounded-full transition-all duration-500" style="width: ${expPercent}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-        };
-
-        const saveExpenseData = () => {
-            const inputVal = document.getElementById('inp-expense').value;
-            const newExpenseAmt = inputVal ? parseInt(inputVal) : 0;
-
-            if (newExpenseAmt > 0) {
-                let expensesArr = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
-                const todayStr = new Date().toLocaleDateString();
-
-                expensesArr.push({ date: todayStr, amount: newExpenseAmt, timestamp: Date.now(), note: "Manual Input" });
-                localStorage.setItem('aros_daily_expenses', JSON.stringify(expensesArr));
-
-                savedExpense += newExpenseAmt;
-                localStorage.setItem('aros_expenses', savedExpense);
-
-                document.getElementById('inp-expense').value = '';
-
-                renderAdminData();
-                showToast('Pencatatan pengeluaran baru berhasil ditambahkan!');
-            } else {
-                alert("Nominal pengeluaran tidak boleh kosong/nol!");
-            }
-        };
-
-        const renderHistoryTables = () => {
-            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
-            document.getElementById('stat-total-users').innerText = customers.length;
-
-            const recentTbody = document.getElementById('admin-recent-history-table');
-            const fullTbody = document.getElementById('admin-full-history-table');
-
-            recentTbody.innerHTML = '';
-            fullTbody.innerHTML = '';
-
-            if(customers.length === 0) {
-                const emptyRow = `<tr><td colspan="5" class="p-6 text-center text-brand-400">Belum ada akun customer yang terdaftar dalam sistem.</td></tr>`;
-                recentTbody.innerHTML = emptyRow;
-                fullTbody.innerHTML = emptyRow;
-                return;
-            }
-
-            customers.forEach(c => {
-                const fname = c.fullName || '-';
-                const email = c.email || '-';
-                const nick = c.nickname || c.name || 'Unknown';
-
-                fullTbody.innerHTML += `
-                    <tr class="hover:bg-brand-50 transition">
-                        <td class="p-3 font-semibold text-brand-900">${fname}</td>
-                        <td class="p-3 text-brand-600 font-medium">@${nick}</td>
-                        <td class="p-3 text-gray-500">${email}</td>
-                        <td class="p-3">${c.dateJoin || c.date}</td>
-                        <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${c.status || 'Aktif'}</span></td>
-                    </tr>`;
-            });
-
-            const recentCustomers = [...customers].reverse().slice(0, 3);
-            recentCustomers.forEach(c => {
-                const email = c.email || '-';
-                const nick = c.nickname || c.name || 'Unknown';
-                recentTbody.innerHTML += `
-                    <tr>
-                        <td class="p-3 font-bold text-brand-700">@${nick}</td>
-                        <td class="p-3 text-gray-500">${email}</td>
-                        <td class="p-3 text-xs italic">${c.dateJoin || c.date}</td>
-                    </tr>`;
-            });
-        };
-
-        const updateOrderStatus = (index, newStatus) => {
-            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
-            orders[index].status = newStatus;
-            localStorage.setItem('aros_orders', JSON.stringify(orders));
-            showToast('Status pengiriman berhasil diperbarui!');
-        };
-
-        const handleStatusChange = (index, newStatus) => {
-            if (newStatus === 'Pesanan Dibatalkan') {
-                let reason = prompt("Masukkan alasan pembatalan (misal: kurir bermasalah, salah pesanan, stok kosong):");
-
-                if (reason === null || reason.trim() === '') {
-                    renderOrdersTable(); 
-                    return;
-                }
-
-                orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
-                let order = orders[index];
-                order.status = `Pesanan Dibatalkan - ${reason}`;
-                localStorage.setItem('aros_orders', JSON.stringify(orders));
-
-                let prods = JSON.parse(localStorage.getItem('aros_products')) || [];
-                if(order.items && order.items.length > 0) {
-                    order.items.forEach(item => {
-                        let pIdx = prods.findIndex(p => p.name === item.name);
-                        if(pIdx !== -1) {
-                            let qtyToReturn = parseInt(item.qty) || 1;
-                            prods[pIdx].stock += qtyToReturn;
-                            prods[pIdx].sold = Math.max(0, (prods[pIdx].sold || 0) - qtyToReturn);
-                        }
-                    });
-                    localStorage.setItem('aros_products', JSON.stringify(prods));
-                }
-
-                showToast('Pesanan dibatalkan & Stok barang dikembalikan otomatis!');
-                renderAdminData(); 
-                renderOrdersTable(); 
-            } else {
-                updateOrderStatus(index, newStatus);
-            }
-        };
-
-        const renderOrdersTable = () => {
-            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
-            const tbody = document.getElementById('admin-orders-table');
-            tbody.innerHTML = '';
-
-            if(orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-brand-400">Belum ada transaksi pesanan masuk.</td></tr>`;
-                return;
-            }
-
-            const statusOptions = ['Sedang Dikemas', 'Diserahkan ke Logistik', 'Kurir Menuju Lokasi', 'Pesanan Selesai', 'Pesanan Dibatalkan'];
-
-            [...orders].reverse().forEach((o, reversedIndex) => {
-                const originalIndex = orders.length - 1 - reversedIndex;
-                let itemsList = o.items.map(i => `${i.name} (x${i.qty})`).join('<br>');
-                let currentStatus = o.status || 'Sedang Dikemas';
-                let paymentMethod = o.paymentMethod || 'Transfer Bank'; 
-
-                let isCancelled = currentStatus.startsWith('Pesanan Dibatalkan');
-                let selectHTML = '';
-
-                if (isCancelled) {
-                    let reasonText = currentStatus.replace('Pesanan Dibatalkan - ', '');
-                    selectHTML = `
-                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold block mb-1 w-max">DIBATALKAN</span>
-                        <span class="text-[10px] text-gray-500 italic block mt-1"><i class="fa-solid fa-circle-info mr-1"></i>${reasonText}</span>
-                    `;
-                } else {
-                    selectHTML = `<select onchange="handleStatusChange(${originalIndex}, this.value)" class="text-xs p-2 rounded-lg border border-brand-200 bg-brand-50 text-brand-700 font-bold outline-none cursor-pointer hover:border-brand-400 transition w-full">`;
-                    statusOptions.forEach(opt => {
-                        selectHTML += `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`;
-                    });
-                    selectHTML += `</select>`;
-                }
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-brand-50 transition">
-                        <td class="p-3 font-mono text-xs font-bold text-brand-600">${o.orderId || 'ORD-LAMA'}</td>
-                        <td class="p-3">
-                            <span class="font-semibold block text-brand-900">${o.name}</span>
-                            <span class="text-[10px] text-gray-500">${o.phone} | ${o.date}</span><br>
-                            <span class="text-xs text-gray-600 line-clamp-2 mt-1">${o.address}</span>
-                        </td>
-                        <td class="p-3 text-xs leading-relaxed">${itemsList}</td>
-                        <td class="p-3">
-                            <span class="font-bold text-brand-700 block">${formatRupiah(o.total)}</span>
-                            <span class="inline-block mt-1 bg-brand-100 text-brand-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">${paymentMethod}</span>
-                        </td>
-                        <td class="p-3">${selectHTML}</td>
-                    </tr>`;
-            });
-        };
-
-        const renderReportBars = () => {
-            products = JSON.parse(localStorage.getItem('aros_products')) || [];
-            const container = document.getElementById('report-bars-container');
-            container.innerHTML = '';
-            if(products.length === 0) {
-                container.innerHTML = `<p class="text-brand-400">Belum ada data laporan produk.</p>`;
-                return;
-            }
-
-            products.forEach(p => {
-                const sold = p.sold || 0;
-                const totalIn = p.stock + sold;
-                const percentage = totalIn > 0 ? Math.round((sold / totalIn) * 100) : 0;
-
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <div class="flex justify-between text-sm mb-2 font-semibold">
-                        <span class="text-brand-900">${p.name} <span class="text-xs text-brand-400 font-mono">(${p.code})</span></span>
-                        <span class="text-brand-600">Terjual: ${sold} / Stok Sisa: ${p.stock}</span>
-                    </div>
-                    <div class="w-full bg-brand-100 h-3 rounded-full overflow-hidden">
-                        <div class="bg-brand-600 h-3 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        };
-
-        const handleAdminAddProduct = (e) => {
-            e.preventDefault();
-            products = JSON.parse(localStorage.getItem('aros_products')) || [];
-
-            const sizesInput = document.getElementById('inp-sizes').value;
-            const sizesArray = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(Boolean) : [39, 40, 41, 42, 43];
-
-            const newProduct = {
-                id: Date.now(),
-                code: document.getElementById('inp-code').value,
-                name: document.getElementById('inp-name').value,
-                price: parseFloat(document.getElementById('inp-price').value),
-                stock: parseInt(document.getElementById('inp-stock').value),
-                sold: 0,
-                imageUrl: document.getElementById('inp-image').value,
-                sizes: sizesArray
-            };
-
-            products.push(newProduct);
-            localStorage.setItem('aros_products', JSON.stringify(products));
-
-            renderAdminData();
-            showToast('Produk Berhasil Ditambahkan ke Katalog!');
-            e.target.reset();
-            showAdminMenu('admin-products');
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderAdminData();
-            initAdminProfile();
-        });
-    </script>
+    <!-- Notifikasi (Toast) -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-brand-600 text-white px-6 py-3 rounded-lg shadow-lg shadow-brand-500/30 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-check-circle"></i>
+        <span id="toast-message">Notifikasi</span>
+    </div>
+
+    <!-- MODAL POP UP EDIT PRODUK -->
+    <div id="edit-modal" class="fixed inset-0 bg-brand-900/60 z-50 view-hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 fade-in relative">
+            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-brand-400 hover:text-red-500 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-brand-900">Edit Info Produk</h3>
+                <p class="text-xs text-brand-500 mt-1">Ubah rincian nama atau harga untuk katalog ini.</p>
+            </div>
+            
+            <form onsubmit="saveEditedProduct(event)" class="space-y-6">
+                <input type="hidden" id="edit-inp-id">
+                
+                <div>
+                    <label for="edit-inp-name" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Nama Sepatu</label>
+                    <input type="text" id="edit-inp-name" class="input-minimal mt-2 font-medium" required placeholder="Contoh: AROS Runner Pro">
+                </div>
+                
+                <div>
+                    <label for="edit-inp-price" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Harga Jual (Rp)</label>
+                    <input type="number" id="edit-inp-price" class="input-minimal mt-2 font-medium" required placeholder="Contoh: 1200000">
+                </div>
+                
+                <div class="flex gap-3 pt-4 border-t border-brand-50">
+                    <button type="button" onclick="closeEditModal()" class="w-full bg-brand-50 text-brand-600 px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-brand-100 transition">Batal</button>
+                    <button type="submit" class="w-full bg-amber-500 text-white px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-amber-600 transition shadow-lg shadow-amber-500/30">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- AKHIR MODAL EDIT PRODUK -->
+
+    <!-- MODAL RESTOCK / SUPLAI TOKO (DENGAN HITUNG OTOMATIS) -->
+    <div id="restock-modal" class="fixed inset-0 bg-brand-900/60 z-50 view-hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 fade-in relative">
+            <button onclick="closeRestockModal()" class="absolute top-4 right-4 text-brand-400 hover:text-red-500 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-brand-900">Beli Suplai Toko</h3>
+                <p class="text-xs text-brand-500 mt-1">Sistem akan otomatis menghitung total modal pengeluaranmu.</p>
+                <div id="restock-product-name" class="mt-4 p-3 bg-brand-50 rounded-lg text-sm font-bold text-brand-700 border border-brand-100 text-center"></div>
+            </div>
+            
+            <form onsubmit="saveRestockData(event)" class="space-y-4">
+                <input type="hidden" id="restock-inp-id">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="restock-inp-qty" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Qty Suplai Baru</label>
+                        <input type="number" id="restock-inp-qty" oninput="calculateTotalRestock()" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="1">
+                    </div>
+                    <div>
+                        <label for="restock-inp-unit-cost" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Modal per Pasang (Rp)</label>
+                        <input type="number" id="restock-inp-unit-cost" oninput="calculateTotalRestock()" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="0">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="restock-inp-sizes" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Ukuran Tersedia (Pisah Koma)</label>
+                    <input type="text" id="restock-inp-sizes" class="input-minimal mt-1 font-medium text-sm" placeholder="39, 40, 41...">
+                </div>
+                
+                <div class="mt-2">
+                    <label class="text-xs uppercase tracking-widest text-brand-500 font-bold">Total Harga Beli (Otomatis)</label>
+                    <div class="flex justify-between items-center bg-red-50 border border-red-100 rounded-xl p-4 mt-2">
+                        <span class="text-xs text-red-500 font-bold uppercase tracking-widest">Total:</span>
+                        <span id="restock-display-total" class="text-2xl font-black text-red-600">Rp 0</span>
+                    </div>
+                    <!-- Input tersembunyi ini yang akan menyimpan nilai hitungan untuk database -->
+                    <input type="hidden" id="restock-inp-total-cost" value="0">
+                    <p class="text-[10px] text-red-400 mt-1 italic">*Nominal ini akan otomatis memotong laba harian toko sebagai pengeluaran.</p>
+                </div>
+                
+                <div class="flex gap-3 pt-4 border-t border-brand-50 mt-4">
+                    <button type="button" onclick="closeRestockModal()" class="w-full bg-brand-50 text-brand-600 px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-brand-100 transition">Batal</button>
+                    <button type="submit" class="w-full bg-emerald-500 text-white px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/30"><i class="fa-solid fa-truck-fast mr-1"></i> Simpan Suplai</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- AKHIR MODAL RESTOCK / SUPLAI -->
+
+    <div class="min-h-screen flex flex-col md:flex-row relative z-10">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-white border-r border-brand-100 flex flex-col shadow-sm">
+            <div class="p-8 border-b border-brand-100 bg-brand-900 text-white relative overflow-hidden">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmcHqbGY0tJyyxBrlWjlFFx9BCd96X2maGL6mhyv2Wzw&s=10" class="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-overlay">
+                <div class="absolute inset-0 bg-brand-900/80 z-0"></div>
+                
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold tracking-tighter">AROS</h2>
+                    <p class="text-xs uppercase tracking-widest text-brand-100 mt-1">Admin Panel</p>
+                </div>
+
+                <div class="relative z-10 mt-6 pt-5 border-t border-brand-700 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm shadow-inner">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <p id="sidebar-admin-name" class="text-sm font-bold text-white leading-tight">Admin</p>
+                        <p id="sidebar-admin-id" class="text-[10px] text-brand-200 font-mono mt-0.5 uppercase tracking-widest">ID: -</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="showAdminMenu('admin-dash')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors font-medium">Dashboard</button>
+                <button onclick="showAdminMenu('admin-products')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Katalog Produk</button>
+                <button onclick="showAdminMenu('admin-input')" class="w-full text-left px-4 py-3 rounded text-sm bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors font-semibold shadow-sm">+ Input Barang</button>
+                <button onclick="showAdminMenu('admin-history')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">History Akun</button>
+                <button onclick="showAdminMenu('admin-customers')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Data Pelanggan</button>
+                <button onclick="showAdminMenu('admin-reports')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Produk</button>
+                <button onclick="showAdminMenu('admin-daily')" class="w-full text-left px-4 py-3 rounded text-sm hover:bg-brand-50 hover:text-brand-600 transition-colors">Laporan Harian</button>
+            </nav>
+            <div class="p-4 border-t border-brand-100">
+                <a href="index.html" class="block w-full text-center px-4 py-3 text-sm text-red-500 bg-red-50 hover:bg-red-100 rounded transition-colors font-semibold"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Log Out</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12 overflow-y-auto">
+            
+            <!-- Dashboard -->
+            <div id="admin-dash" class="admin-section fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1 text-brand-900">Overview Kinerja</h3>
+                        <p class="text-brand-500 text-sm">Data real-time toko.</p>
+                    </div>
+                    
+                    <div class="bg-white px-5 py-2.5 rounded-xl border border-brand-100 shadow-sm flex items-center gap-3">
+                        <div class="text-right">
+                            <p class="text-xs text-brand-500 font-medium">Logged in as</p>
+                            <p class="text-sm font-bold text-brand-700 leading-tight" id="dash-admin-name">Admin</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100">
+                            <i class="fa-solid fa-id-badge"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Produk</p>
+                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-product">0</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Terjual</p>
+                        <h4 class="text-4xl font-bold text-brand-600" id="stat-total-sold">0</h4>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">User Aktif</p>
+                        <h4 class="text-4xl font-bold text-emerald-600" id="stat-active-users">0</h4>
+                    </div>
+                    <div class="p-6 rounded-xl shadow-md bg-gradient-to-br from-brand-600 to-brand-900 text-white flex flex-col justify-center">
+                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2">Pendapatan Bersih</p>
+                        <h4 class="text-2xl font-bold" id="stat-total-revenue">Rp 0</h4>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h4 class="text-lg font-bold text-brand-900"><i class="fa-solid fa-chart-bar mr-2 text-brand-600"></i> Statistik Keuangan (3 Hari)</h4>
+                            <p class="text-xs text-brand-500 mt-1">Perbandingan arus kas pemasukan dan pengeluaran secara real-time berdasarkan riwayat.</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-semibold">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-brand-600 rounded-sm inline-block"></span> Pemasukan</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-red-400 rounded-sm inline-block"></span> Pengeluaran</span>
+                        </div>
+                    </div>
+                    <div id="financial-bars-container" class="space-y-6"></div>
+                </div>
+            </div>
+
+            <!-- Katalog Produk -->
+            <div id="admin-products" class="admin-section view-hidden fade-in">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold">Katalog Produk AROS</h3>
+                        <p class="text-xs text-brand-500 mt-1">Kelola stok, ukuran, status, dan data produk secara real-time.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-brand-50 text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr><th class="p-4 font-semibold">Nama Sepatu</th><th class="p-4 font-semibold">Harga Jual</th><th class="p-4 font-semibold">Stok & Ukuran Tersedia</th><th class="p-4 font-semibold">Aksi / Terjual</th></tr>
+                        </thead>
+                        <tbody id="admin-product-table-body" class="divide-y divide-brand-50"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Input Barang -->
+            <div id="admin-input" class="admin-section view-hidden fade-in">
+                <div class="max-w-2xl bg-white p-8 rounded-xl border border-brand-100 shadow-sm">
+                    <h3 class="text-2xl font-bold mb-6 text-brand-600">Tambah Produk Baru (Master Data)</h3>
+                    <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label for="inp-code" class="text-xs uppercase tracking-widest text-brand-500">Kode Sepatu</label><input type="text" id="inp-code" class="input-minimal mt-2" required placeholder="AR-001"></div>
+                            <div><label for="inp-price" class="text-xs uppercase tracking-widest text-brand-500">Harga Jual (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
+                        </div>
+                        <div><label for="inp-name" class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div><label for="inp-stock" class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok Awal</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
+                            <div><label for="inp-sizes" class="text-xs uppercase tracking-widest text-brand-500">Ukuran Tersedia (Pisah Koma)</label><input type="text" id="inp-sizes" class="input-minimal mt-2" required placeholder="39, 40, 41, 42, 43"></div>
+                        </div>
+                        <div><label for="inp-image" class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
+                        <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan Ke Katalog</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- History Akun Customer -->
+            <div id="admin-history" class="admin-section view-hidden fade-in">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-brand-900">Manajemen Akun Customer</h3>
+                        <p class="text-brand-500 text-sm mt-1">Data sinkronisasi dari pendaftaran sistem utama.</p>
+                    </div>
+                    <div class="bg-brand-100 text-brand-700 px-4 py-2 rounded-lg font-bold text-sm">
+                        Total Pendaftar: <span id="stat-total-users">0</span> Akun
+                    </div>
+                </div>
+
+                <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Pendaftaran Terbaru</h4>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-4 mb-10">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-[10px] uppercase tracking-widest text-gray-400 border-b border-brand-50">
+                            <tr><th class="p-3">Nickname</th><th class="p-3">Email</th><th class="p-3">Kapan Ditambahkan</th></tr>
+                        </thead>
+                        <tbody id="admin-recent-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+
+                <h4 class="text-md font-bold mb-3 text-brand-700"><i class="fa-solid fa-users mr-2"></i> Daftar Seluruh Akun</h4>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-[11px] uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr>
+                                <th class="p-3">Nama Lengkap</th>
+                                <th class="p-3">Username / Nickname</th>
+                                <th class="p-3">Alamat Email</th>
+                                <th class="p-3">Tanggal Daftar</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-full-history-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Data Pelanggan (Transaksi & Pengiriman) -->
+            <div id="admin-customers" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-8">Data Transaksi & Pengiriman</h3>
+                <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto p-6">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-xs uppercase tracking-widest text-brand-600 border-b border-brand-100">
+                            <tr>
+                                <th class="p-3">ID Pesanan</th>
+                                <th class="p-3">Info Pembeli</th>
+                                <th class="p-3">Produk Dibeli</th>
+                                <th class="p-3">Pembayaran</th>
+                                <th class="p-3">Status Pengiriman</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table" class="divide-y divide-brand-50 text-brand-800"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Laporan Produk -->
+            <div id="admin-reports" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-2">Laporan & Statistik Produk</h3>
+                <p class="text-brand-500 mb-8">Perbandingan stok masuk dengan volume produk keluar.</p>
+                <div class="bg-white p-8 rounded-xl border border-brand-100 shadow-sm space-y-8 max-w-3xl" id="report-bars-container"></div>
+            </div>
+
+            <!-- Laporan Harian -->
+            <div id="admin-daily" class="admin-section view-hidden fade-in">
+                <h3 class="text-2xl font-bold mb-2">Laporan Finansial Harian</h3>
+                <p class="text-brand-500 mb-8">Ringkasan arus kas operasional toko. Masukkan pengeluaran selain suplai secara manual (Contoh: Listrik / Gaji).</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
+                        <p class="text-xs uppercase tracking-widest text-brand-500 mb-2">Total Pemasukan (Kotor)</p>
+                        <h4 class="text-2xl font-bold text-brand-600" id="daily-income">Rp 0</h4>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl border border-brand-100 shadow-sm flex flex-col justify-center">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-xs uppercase tracking-widest text-brand-500">Catat Pengeluaran Baru</p>
+                            <p class="text-[10px] text-brand-400">Total: <span id="total-expense-display" class="font-bold text-red-500">Rp 0</span></p>
+                        </div>
+                        <div class="flex items-center gap-2 border-b-2 border-brand-100 focus-within:border-red-400 transition-colors pb-1">
+                            <span class="text-red-500 font-bold">Rp</span>
+                            <input type="number" id="inp-expense" class="w-full outline-none text-lg font-bold text-red-500 bg-transparent placeholder-red-300" placeholder="0">
+                            <button onclick="saveExpenseData()" class="bg-brand-50 hover:bg-brand-100 text-brand-600 px-3 py-1.5 rounded-lg text-xs font-bold transition ml-auto shadow-sm">Catat</button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 rounded-xl shadow-md bg-brand-600 text-white flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 w-16 h-16 bg-brand-500 rounded-full opacity-50 blur-xl"></div>
+                        <p class="text-xs uppercase tracking-widest text-brand-100 mb-2 relative z-10">Total Laba Bersih</p>
+                        <h4 class="text-2xl font-bold relative z-10" id="daily-profit">Rp 0</h4>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let products = [];
+        let customers = [];
+        let orders = [];
+        let savedExpense = 0;
+
+        const initAdminProfile = () => {
+            const currentAdminName = localStorage.getItem('aros_current_admin') || 'Super Admin';
+            const admins = JSON.parse(localStorage.getItem('aros_admins')) || [];
+            const currentAdminData = admins.find(a => a.name === currentAdminName) || { id: 'admin', name: currentAdminName };
+            
+            document.getElementById('sidebar-admin-name').innerText = currentAdminData.name;
+            document.getElementById('sidebar-admin-id').innerText = `ID: ${currentAdminData.id}`;
+            document.getElementById('dash-admin-name').innerText = currentAdminData.name;
+        };
+
+        const showToast = (msg) => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        };
+
+        const formatRupiah = (number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+
+        const showAdminMenu = (sectionId) => {
+            document.querySelectorAll('.admin-section').forEach(el => el.classList.add('view-hidden'));
+            document.getElementById(sectionId).classList.remove('view-hidden');
+            
+            renderAdminData();
+            if(sectionId === 'admin-reports') renderReportBars();
+            if(sectionId === 'admin-history') renderHistoryTables();
+            if(sectionId === 'admin-customers') renderOrdersTable();
+        };
+
+        const renderAdminData = () => {
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            savedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
+
+            document.getElementById('stat-total-product').innerText = products.length;
+            
+            let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
+            document.getElementById('stat-total-sold').innerText = totalSold;
+            document.getElementById('stat-active-users').innerText = customers.length;
+
+            let validOrders = orders.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
+            let totalIncome = validOrders.reduce((acc, o) => acc + o.total, 0); 
+            let netProfit = totalIncome - savedExpense; 
+
+            document.getElementById('daily-income').innerText = formatRupiah(totalIncome);
+            
+            const expDisplay = document.getElementById('total-expense-display');
+            if (expDisplay) expDisplay.innerText = formatRupiah(savedExpense);
+            
+            const profitEl = document.getElementById('daily-profit');
+            profitEl.innerText = formatRupiah(netProfit);
+            profitEl.className = netProfit < 0 ? "text-2xl font-bold relative z-10 text-red-200" : "text-2xl font-bold relative z-10 text-white";
+
+            document.getElementById('stat-total-revenue').innerText = formatRupiah(netProfit);
+
+            renderFinancialBars(totalIncome, savedExpense);
+
+            const tbody = document.getElementById('admin-product-table-body');
+            tbody.innerHTML = '';
+            
+            if(products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-brand-400">Belum ada produk. Silakan tambah barang baru di menu "+ Input Barang".</td></tr>`;
+                return;
+            }
+
+            products.forEach(p => {
+                const isSoldOut = (p.stock === 0 || p.stock === undefined);
+                const sizesText = p.sizes ? p.sizes.join(', ') : '-';
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-brand-50 transition-colors";
+                
+                tr.innerHTML = `
+                    <td class="p-4 flex items-center gap-4">
+                        <img src="${p.imageUrl}" class="w-12 h-12 rounded-lg object-cover bg-brand-100 shadow-sm">
+                        <div><p class="font-bold text-brand-900">${p.name}</p><p class="text-xs text-brand-500 font-mono">${p.code}</p></div>
+                    </td>
+                    <td class="p-4 font-medium">${formatRupiah(p.price)}</td>
+                    <td class="p-4">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-full text-xs font-bold">${p.stock} pcs</span>
+                                ${isSoldOut ? '<span class="bg-red-100 text-red-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Terkunci (Habis)</span>' : '<span class="bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Aktif / Tersedia</span>'}
+                            </div>
+                            <span class="text-[11px] text-brand-500">Ukuran: <b>${sizesText}</b></span>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-medium text-brand-600 mr-2">${p.sold || 0} terjual</span>
+                            
+                            <button onclick="openEditModal(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Edit Nama & Harga">
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </button>
+                            
+                            <button onclick="openRestockModal(${p.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Beli Suplai Barang">
+                                <i class="fa-solid fa-truck-fast"></i> Suplai
+                            </button>
+                            
+                            <button onclick="deleteProduct(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Hapus Produk">
+                                <i class="fa-solid fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        /* ================= FUNGSI UNTUK MODAL EDIT PRODUK ================= */
+        const openEditModal = (id) => {
+            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let p = products.find(prod => prod.id === id);
+            
+            if(p) {
+                document.getElementById('edit-inp-id').value = p.id;
+                document.getElementById('edit-inp-name').value = p.name;
+                document.getElementById('edit-inp-price').value = p.price;
+                
+                document.getElementById('edit-modal').classList.remove('view-hidden');
+            }
+        };
+
+        const closeEditModal = () => {
+            document.getElementById('edit-modal').classList.add('view-hidden');
+        };
+
+        const saveEditedProduct = (e) => {
+            e.preventDefault();
+            
+            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let idToEdit = parseInt(document.getElementById('edit-inp-id').value);
+            let newName = document.getElementById('edit-inp-name').value.trim();
+            let newPrice = parseFloat(document.getElementById('edit-inp-price').value);
+
+            let productIndex = products.findIndex(prod => prod.id === idToEdit);
+            
+            if (productIndex !== -1) {
+                if (newName !== '' && !isNaN(newPrice) && newPrice >= 0) {
+                    products[productIndex].name = newName;
+                    products[productIndex].price = newPrice;
+                    
+                    localStorage.setItem('aros_products', JSON.stringify(products));
+                    renderAdminData();
+                    showToast(`Info ${newName} berhasil diperbarui!`);
+                    
+                    closeEditModal();
+                } else {
+                    alert("Harap pastikan nama dan harga sudah diisi dengan benar.");
+                }
+            }
+        };
+
+        /* ================= FUNGSI UNTUK MODAL RESTOCK / SUPLAI ================= */
+        // Fungsi baru untuk Kalkulator Otomatis
+        const calculateTotalRestock = () => {
+            const qty = parseInt(document.getElementById('restock-inp-qty').value) || 0;
+            const unitCost = parseInt(document.getElementById('restock-inp-unit-cost').value) || 0;
+            const total = qty * unitCost;
+            
+            // Masukkan ke input tersembunyi (untuk diproses JS)
+            document.getElementById('restock-inp-total-cost').value = total;
+            // Tampilkan di teks yang bagus secara visual
+            document.getElementById('restock-display-total').innerText = formatRupiah(total);
+        };
+
+        const openRestockModal = (id) => {
+            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let p = products.find(prod => prod.id === id);
+            
+            if(p) {
+                document.getElementById('restock-inp-id').value = p.id;
+                document.getElementById('restock-product-name').innerText = p.name;
+                
+                // Reset semua input saat modal dibuka
+                document.getElementById('restock-inp-qty').value = '';
+                document.getElementById('restock-inp-unit-cost').value = '';
+                document.getElementById('restock-inp-total-cost').value = '0';
+                document.getElementById('restock-display-total').innerText = 'Rp 0';
+                document.getElementById('restock-inp-sizes').value = p.sizes ? p.sizes.join(', ') : '39, 40, 41, 42, 43';
+                
+                document.getElementById('restock-modal').classList.remove('view-hidden');
+            }
+        };
+
+        const closeRestockModal = () => {
+            document.getElementById('restock-modal').classList.add('view-hidden');
+        };
+
+        const saveRestockData = (e) => {
+            e.preventDefault();
+            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let idToEdit = parseInt(document.getElementById('restock-inp-id').value);
+            let qty = parseInt(document.getElementById('restock-inp-qty').value);
+            let cost = parseInt(document.getElementById('restock-inp-total-cost').value); // Ambil dari hasil hitung otomatis
+            let sizesStr = document.getElementById('restock-inp-sizes').value;
+
+            let productIndex = products.findIndex(prod => prod.id === idToEdit);
+            
+            if(productIndex !== -1 && !isNaN(qty) && qty > 0) {
+                // 1. Tambah Stok Katalog
+                products[productIndex].stock += qty;
+                if(sizesStr.trim() !== '') {
+                    products[productIndex].sizes = sizesStr.split(',').map(s => s.trim()).filter(Boolean);
+                }
+                localStorage.setItem('aros_products', JSON.stringify(products));
+
+                // 2. Catat Otomatis ke Pengeluaran Finansial
+                if (!isNaN(cost) && cost > 0) {
+                    let expensesArr = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
+                    const todayStr = new Date().toLocaleDateString();
+                    expensesArr.push({ 
+                        date: todayStr, 
+                        amount: cost, 
+                        timestamp: Date.now(),
+                        note: `Suplai Barang: ${products[productIndex].name} (${qty} pcs)`
+                    });
+                    localStorage.setItem('aros_daily_expenses', JSON.stringify(expensesArr));
+                    
+                    let currentSavedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
+                    localStorage.setItem('aros_expenses', currentSavedExpense + cost);
+                }
+
+                closeRestockModal();
+                renderAdminData(); // Refresh keseluruhan dashboard, katalog, dan finansial
+                showToast(`Suplai ${products[productIndex].name} berhasil ditambahkan!`);
+            }
+        };
+        /* ======================================================================= */
+
+        const deleteProduct = (id) => {
+            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let p = products.find(prod => prod.id === id);
+            if(p) {
+                if(confirm(`Apakah Anda yakin ingin menghapus produk "${p.name}" dari katalog?`)) {
+                    products = products.filter(prod => prod.id !== id);
+                    localStorage.setItem('aros_products', JSON.stringify(products));
+                    renderAdminData();
+                    showToast('Produk berhasil dihapus dari katalog!');
+                }
+            }
+        };
+
+        const renderFinancialBars = (totalIncome, totalExpense) => {
+            const container = document.getElementById('financial-bars-container');
+            container.innerHTML = '';
+
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            const todayStr = today.toLocaleDateString();
+            const yesterdayStr = yesterday.toLocaleDateString();
+
+            let ordersHist = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            let expensesHist = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
+
+            const validOrdersHist = ordersHist.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
+            
+            const incomeToday = validOrdersHist.filter(o => o.date === todayStr).reduce((acc, o) => acc + o.total, 0);
+            const incomeYesterday = validOrdersHist.filter(o => o.date === yesterdayStr).reduce((acc, o) => acc + o.total, 0);
+            
+            const incomeTomorrow = Math.round((incomeToday + incomeYesterday) / 2) || 0; 
+
+            const expenseToday = expensesHist.filter(e => e.date === todayStr).reduce((acc, e) => acc + e.amount, 0);
+            const expenseYesterday = expensesHist.filter(e => e.date === yesterdayStr).reduce((acc, e) => acc + e.amount, 0);
+            const expenseTomorrow = Math.round((expenseToday + expenseYesterday) / 2) || 0;
+
+            const daysData = [
+                { label: 'Kemarin', income: incomeYesterday, expense: expenseYesterday },
+                { label: 'Hari Ini', income: incomeToday, expense: expenseToday },
+                { label: 'Esok (Estimasi)', income: incomeTomorrow, expense: expenseTomorrow }
+            ];
+
+            const maxVal = Math.max(...daysData.map(d => Math.max(d.income, d.expense)), 100000);
+
+            daysData.forEach(d => {
+                const incPercent = Math.min(100, (d.income / maxVal) * 100);
+                const expPercent = Math.min(100, (d.expense / maxVal) * 100);
+
+                const row = document.createElement('div');
+                row.className = 'border-b border-brand-50 pb-4 last:border-none last:pb-0';
+                row.innerHTML = `
+                    <div class="flex justify-between items-center mb-2 text-xs font-bold uppercase tracking-widest text-brand-700">
+                        <span>${d.label}</span>
+                        <span class="text-brand-500 font-normal">Pemasukan: <strong class="text-brand-700">${formatRupiah(d.income)}</strong> | Pengeluaran: <strong class="text-red-500">${formatRupiah(d.expense)}</strong></span>
+                    </div>
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pemasukan</span><span>${formatRupiah(d.income)}</span></div>
+                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-brand-600 h-2.5 rounded-full transition-all duration-500" style="width: ${incPercent}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] text-brand-500 mb-0.5"><span>Pengeluaran</span><span>${formatRupiah(d.expense)}</span></div>
+                            <div class="w-full bg-brand-50 h-2.5 rounded-full overflow-hidden">
+                                <div class="bg-red-400 h-2.5 rounded-full transition-all duration-500" style="width: ${expPercent}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        };
+
+        const saveExpenseData = () => {
+            const inputVal = document.getElementById('inp-expense').value;
+            const newExpenseAmt = inputVal ? parseInt(inputVal) : 0;
+            
+            if (newExpenseAmt > 0) {
+                let expensesArr = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
+                const todayStr = new Date().toLocaleDateString();
+                
+                expensesArr.push({ date: todayStr, amount: newExpenseAmt, timestamp: Date.now(), note: "Manual Input" });
+                localStorage.setItem('aros_daily_expenses', JSON.stringify(expensesArr));
+                
+                savedExpense += newExpenseAmt;
+                localStorage.setItem('aros_expenses', savedExpense);
+                
+                document.getElementById('inp-expense').value = '';
+                
+                renderAdminData();
+                showToast('Pencatatan pengeluaran baru berhasil ditambahkan!');
+            } else {
+                alert("Nominal pengeluaran tidak boleh kosong/nol!");
+            }
+        };
+
+        const renderHistoryTables = () => {
+            customers = JSON.parse(localStorage.getItem('aros_customers')) || [];
+            document.getElementById('stat-total-users').innerText = customers.length;
+            
+            const recentTbody = document.getElementById('admin-recent-history-table');
+            const fullTbody = document.getElementById('admin-full-history-table');
+            
+            recentTbody.innerHTML = '';
+            fullTbody.innerHTML = '';
+
+            if(customers.length === 0) {
+                const emptyRow = `<tr><td colspan="5" class="p-6 text-center text-brand-400">Belum ada akun customer yang terdaftar dalam sistem.</td></tr>`;
+                recentTbody.innerHTML = emptyRow;
+                fullTbody.innerHTML = emptyRow;
+                return;
+            }
+
+            customers.forEach(c => {
+                const fname = c.fullName || '-';
+                const email = c.email || '-';
+                const nick = c.nickname || c.name || 'Unknown';
+                
+                fullTbody.innerHTML += `
+                    <tr class="hover:bg-brand-50 transition">
+                        <td class="p-3 font-semibold text-brand-900">${fname}</td>
+                        <td class="p-3 text-brand-600 font-medium">@${nick}</td>
+                        <td class="p-3 text-gray-500">${email}</td>
+                        <td class="p-3">${c.dateJoin || c.date}</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-bold">${c.status || 'Aktif'}</span></td>
+                    </tr>`;
+            });
+
+            const recentCustomers = [...customers].reverse().slice(0, 3);
+            recentCustomers.forEach(c => {
+                const email = c.email || '-';
+                const nick = c.nickname || c.name || 'Unknown';
+                recentTbody.innerHTML += `
+                    <tr>
+                        <td class="p-3 font-bold text-brand-700">@${nick}</td>
+                        <td class="p-3 text-gray-500">${email}</td>
+                        <td class="p-3 text-xs italic">${c.dateJoin || c.date}</td>
+                    </tr>`;
+            });
+        };
+
+        const updateOrderStatus = (index, newStatus) => {
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            orders[index].status = newStatus;
+            localStorage.setItem('aros_orders', JSON.stringify(orders));
+            showToast('Status pengiriman berhasil diperbarui!');
+        };
+
+        const handleStatusChange = (index, newStatus) => {
+            if (newStatus === 'Pesanan Dibatalkan') {
+                let reason = prompt("Masukkan alasan pembatalan (misal: kurir bermasalah, salah pesanan, stok kosong):");
+                
+                if (reason === null || reason.trim() === '') {
+                    renderOrdersTable(); 
+                    return;
+                }
+                
+                orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+                let order = orders[index];
+                order.status = `Pesanan Dibatalkan - ${reason}`;
+                localStorage.setItem('aros_orders', JSON.stringify(orders));
+                
+                let prods = JSON.parse(localStorage.getItem('aros_products')) || [];
+                if(order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        let pIdx = prods.findIndex(p => p.name === item.name);
+                        if(pIdx !== -1) {
+                            let qtyToReturn = parseInt(item.qty) || 1;
+                            prods[pIdx].stock += qtyToReturn;
+                            prods[pIdx].sold = Math.max(0, (prods[pIdx].sold || 0) - qtyToReturn);
+                        }
+                    });
+                    localStorage.setItem('aros_products', JSON.stringify(prods));
+                }
+                
+                showToast('Pesanan dibatalkan & Stok barang dikembalikan otomatis!');
+                renderAdminData(); 
+                renderOrdersTable(); 
+            } else {
+                updateOrderStatus(index, newStatus);
+            }
+        };
+
+        const renderOrdersTable = () => {
+            orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+            const tbody = document.getElementById('admin-orders-table');
+            tbody.innerHTML = '';
+            
+            if(orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-brand-400">Belum ada transaksi pesanan masuk.</td></tr>`;
+                return;
+            }
+            
+            const statusOptions = ['Sedang Dikemas', 'Diserahkan ke Logistik', 'Kurir Menuju Lokasi', 'Pesanan Selesai', 'Pesanan Dibatalkan'];
+
+            [...orders].reverse().forEach((o, reversedIndex) => {
+                const originalIndex = orders.length - 1 - reversedIndex;
+                let itemsList = o.items.map(i => `${i.name} (x${i.qty})`).join('<br>');
+                let currentStatus = o.status || 'Sedang Dikemas';
+                let paymentMethod = o.paymentMethod || 'Transfer Bank'; 
+                
+                let isCancelled = currentStatus.startsWith('Pesanan Dibatalkan');
+                let selectHTML = '';
+                
+                if (isCancelled) {
+                    let reasonText = currentStatus.replace('Pesanan Dibatalkan - ', '');
+                    selectHTML = `
+                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold block mb-1 w-max">DIBATALKAN</span>
+                        <span class="text-[10px] text-gray-500 italic block mt-1"><i class="fa-solid fa-circle-info mr-1"></i>${reasonText}</span>
+                    `;
+                } else {
+                    selectHTML = `<select onchange="handleStatusChange(${originalIndex}, this.value)" class="text-xs p-2 rounded-lg border border-brand-200 bg-brand-50 text-brand-700 font-bold outline-none cursor-pointer hover:border-brand-400 transition w-full">`;
+                    statusOptions.forEach(opt => {
+                        selectHTML += `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`;
+                    });
+                    selectHTML += `</select>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-brand-50 transition">
+                        <td class="p-3 font-mono text-xs font-bold text-brand-600">${o.orderId || 'ORD-LAMA'}</td>
+                        <td class="p-3">
+                            <span class="font-semibold block text-brand-900">${o.name}</span>
+                            <span class="text-[10px] text-gray-500">${o.phone} | ${o.date}</span><br>
+                            <span class="text-xs text-gray-600 line-clamp-2 mt-1">${o.address}</span>
+                        </td>
+                        <td class="p-3 text-xs leading-relaxed">${itemsList}</td>
+                        <td class="p-3">
+                            <span class="font-bold text-brand-700 block">${formatRupiah(o.total)}</span>
+                            <span class="inline-block mt-1 bg-brand-100 text-brand-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">${paymentMethod}</span>
+                        </td>
+                        <td class="p-3">${selectHTML}</td>
+                    </tr>`;
+            });
+        };
+
+        const renderReportBars = () => {
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            const container = document.getElementById('report-bars-container');
+            container.innerHTML = '';
+            if(products.length === 0) {
+                container.innerHTML = `<p class="text-brand-400">Belum ada data laporan produk.</p>`;
+                return;
+            }
+
+            products.forEach(p => {
+                const sold = p.sold || 0;
+                const totalIn = p.stock + sold;
+                const percentage = totalIn > 0 ? Math.round((sold / totalIn) * 100) : 0;
+
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="flex justify-between text-sm mb-2 font-semibold">
+                        <span class="text-brand-900">${p.name} <span class="text-xs text-brand-400 font-mono">(${p.code})</span></span>
+                        <span class="text-brand-600">Terjual: ${sold} / Stok Sisa: ${p.stock}</span>
+                    </div>
+                    <div class="w-full bg-brand-100 h-3 rounded-full overflow-hidden">
+                        <div class="bg-brand-600 h-3 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        const handleAdminAddProduct = (e) => {
+            e.preventDefault();
+            products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            
+            const sizesInput = document.getElementById('inp-sizes').value;
+            const sizesArray = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(Boolean) : [39, 40, 41, 42, 43];
+
+            const newProduct = {
+                id: Date.now(),
+                code: document.getElementById('inp-code').value,
+                name: document.getElementById('inp-name').value,
+                price: parseFloat(document.getElementById('inp-price').value),
+                stock: parseInt(document.getElementById('inp-stock').value),
+                sold: 0,
+                imageUrl: document.getElementById('inp-image').value,
+                sizes: sizesArray
+            };
+
+            products.push(newProduct);
+            localStorage.setItem('aros_products', JSON.stringify(products));
+            
+            renderAdminData();
+            showToast('Produk Berhasil Ditambahkan ke Katalog!');
+            e.target.reset();
+            showAdminMenu('admin-products');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAdminData();
+            initAdminProfile();
+        });
+    </script>
 </body>
 </html>
