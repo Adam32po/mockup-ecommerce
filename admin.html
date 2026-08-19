@@ -138,7 +138,7 @@
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h3 class="text-2xl font-bold">Katalog Produk AROS</h3>
-                        <p class="text-xs text-brand-500 mt-1">Kelola stok, ukuran, dan status produk secara real-time.</p>
+                        <p class="text-xs text-brand-500 mt-1">Kelola stok, ukuran, status, dan data produk secara real-time.</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl border border-brand-100 shadow-sm overflow-x-auto">
@@ -344,6 +344,8 @@
                 const sizesText = p.sizes ? p.sizes.join(', ') : '-';
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-brand-50 transition-colors";
+                
+                /* PENAMBAHAN TOMBOL EDIT DI SINI */
                 tr.innerHTML = `
                     <td class="p-4 flex items-center gap-4">
                         <img src="${p.imageUrl}" class="w-12 h-12 rounded-lg object-cover bg-brand-100 shadow-sm">
@@ -360,11 +362,17 @@
                         </div>
                     </td>
                     <td class="p-4">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="font-medium text-brand-600 mr-2">${p.sold || 0} terjual</span>
-                            <button onclick="restockProduct(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Tambah Stok & Perbarui Ukuran">
-                                <i class="fa-solid fa-plus"></i> Restock & Ukuran
+                            
+                            <button onclick="editProductInfo(${p.id})" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Edit Nama & Harga">
+                                <i class="fa-solid fa-pen"></i> Edit
                             </button>
+                            
+                            <button onclick="restockProduct(${p.id})" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Tambah Stok & Perbarui Ukuran">
+                                <i class="fa-solid fa-plus"></i> Restock
+                            </button>
+                            
                             <button onclick="deleteProduct(${p.id})" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow-sm flex items-center gap-1" title="Hapus Produk">
                                 <i class="fa-solid fa-trash"></i> Hapus
                             </button>
@@ -373,6 +381,37 @@
                 `;
                 tbody.appendChild(tr);
             });
+        };
+
+        /* FUNGSI BARU UNTUK EDIT NAMA & HARGA */
+        const editProductInfo = (id) => {
+            let products = JSON.parse(localStorage.getItem('aros_products')) || [];
+            let p = products.find(prod => prod.id === id);
+            
+            if(p) {
+                // Konfirmasi Ubah Nama
+                let newName = prompt(`Ubah Nama Produk:`, p.name);
+                if(newName !== null && newName.trim() !== '') {
+                    // Konfirmasi Ubah Harga
+                    let newPrice = prompt(`Ubah Harga Produk (Rp):`, p.price);
+                    if(newPrice !== null) {
+                        let priceNum = parseFloat(newPrice);
+                        if(!isNaN(priceNum) && priceNum >= 0) {
+                            // Simpan Data
+                            p.name = newName.trim();
+                            p.price = priceNum;
+                            localStorage.setItem('aros_products', JSON.stringify(products));
+                            
+                            renderAdminData(); // Refresh Tabel
+                            showToast(`Info ${p.name} berhasil diperbarui!`);
+                        } else {
+                            alert('Harga yang dimasukkan tidak valid. Harap masukkan angka saja.');
+                        }
+                    }
+                } else if (newName !== null) {
+                    alert('Nama produk tidak boleh kosong!');
+                }
+            }
         };
 
         const restockProduct = (id) => {
@@ -484,18 +523,15 @@
             const newExpenseAmt = inputVal ? parseInt(inputVal) : 0;
             
             if (newExpenseAmt > 0) {
-                // 1. Simpan riwayat per hari
                 let expensesArr = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
                 const todayStr = new Date().toLocaleDateString();
                 
                 expensesArr.push({ date: todayStr, amount: newExpenseAmt, timestamp: Date.now() });
                 localStorage.setItem('aros_daily_expenses', JSON.stringify(expensesArr));
                 
-                // 2. Tambahkan ke total akumulasi pengeluaran
                 savedExpense += newExpenseAmt;
                 localStorage.setItem('aros_expenses', savedExpense);
                 
-                // 3. Reset input field
                 document.getElementById('inp-expense').value = '';
                 
                 renderAdminData();
