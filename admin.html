@@ -58,12 +58,12 @@
                 <input type="hidden" id="edit-inp-id">
                 
                 <div>
-                    <label class="text-xs uppercase tracking-widest text-brand-500 font-bold">Nama Sepatu</label>
+                    <label for="edit-inp-name" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Nama Sepatu</label>
                     <input type="text" id="edit-inp-name" class="input-minimal mt-2 font-medium" required placeholder="Contoh: AROS Runner Pro">
                 </div>
                 
                 <div>
-                    <label class="text-xs uppercase tracking-widest text-brand-500 font-bold">Harga (Rp)</label>
+                    <label for="edit-inp-price" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Harga (Rp)</label>
                     <input type="number" id="edit-inp-price" class="input-minimal mt-2 font-medium" required placeholder="Contoh: 1200000">
                 </div>
                 
@@ -193,15 +193,15 @@
                     <h3 class="text-2xl font-bold mb-6 text-brand-600">Tambah Produk Baru</h3>
                     <form onsubmit="handleAdminAddProduct(event)" class="space-y-6">
                         <div class="grid grid-cols-2 gap-6">
-                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Kode Sepatu</label><input type="text" id="inp-code" class="input-minimal mt-2" required placeholder="AR-001"></div>
-                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Harga (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
+                            <div><label for="inp-code" class="text-xs uppercase tracking-widest text-brand-500">Kode Sepatu</label><input type="text" id="inp-code" class="input-minimal mt-2" required placeholder="AR-001"></div>
+                            <div><label for="inp-price" class="text-xs uppercase tracking-widest text-brand-500">Harga (Rp)</label><input type="number" id="inp-price" class="input-minimal mt-2" required placeholder="1200000"></div>
                         </div>
-                        <div><label class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
+                        <div><label for="inp-name" class="text-xs uppercase tracking-widest text-brand-500">Nama Sepatu</label><input type="text" id="inp-name" class="input-minimal mt-2" required placeholder="AROS Runner Pro"></div>
                         <div class="grid grid-cols-2 gap-6">
-                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
-                            <div><label class="text-xs uppercase tracking-widest text-brand-500">Ukuran Tersedia (Pisah Koma)</label><input type="text" id="inp-sizes" class="input-minimal mt-2" required placeholder="39, 40, 41, 42, 43"></div>
+                            <div><label for="inp-stock" class="text-xs uppercase tracking-widest text-brand-500">Jumlah Stok</label><input type="number" id="inp-stock" class="input-minimal mt-2" required placeholder="25"></div>
+                            <div><label for="inp-sizes" class="text-xs uppercase tracking-widest text-brand-500">Ukuran Tersedia (Pisah Koma)</label><input type="text" id="inp-sizes" class="input-minimal mt-2" required placeholder="39, 40, 41, 42, 43"></div>
                         </div>
-                        <div><label class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
+                        <div><label for="inp-image" class="text-xs uppercase tracking-widest text-brand-500">URL Gambar</label><input type="url" id="inp-image" class="input-minimal mt-2" required placeholder="https://..."></div>
                         <button type="submit" class="bg-brand-600 text-white px-8 py-3 rounded-md uppercase tracking-widest text-xs font-bold hover:bg-brand-700 transition shadow-lg shadow-brand-500/30">Simpan & Sinkronisasi</button>
                     </form>
                 </div>
@@ -347,11 +347,15 @@
             savedExpense = parseInt(localStorage.getItem('aros_expenses')) || 0;
 
             document.getElementById('stat-total-product').innerText = products.length;
+            
+            // Total Terjual didapat dari data katalog yang sudah disesuaikan dengan pesanan (termasuk jika batal)
             let totalSold = products.reduce((acc, p) => acc + (p.sold || 0), 0);
             document.getElementById('stat-total-sold').innerText = totalSold;
             document.getElementById('stat-active-users').innerText = customers.length;
 
-            let totalIncome = orders.reduce((acc, o) => acc + o.total, 0); 
+            // Filter pesanan dibatalkan agar tidak masuk perhitungan uang
+            let validOrders = orders.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
+            let totalIncome = validOrders.reduce((acc, o) => acc + o.total, 0); 
             let netProfit = totalIncome - savedExpense; 
 
             document.getElementById('daily-income').innerText = formatRupiah(totalIncome);
@@ -424,18 +428,15 @@
             let p = products.find(prod => prod.id === id);
             
             if(p) {
-                // Isi form dengan data yang sudah ada
                 document.getElementById('edit-inp-id').value = p.id;
                 document.getElementById('edit-inp-name').value = p.name;
                 document.getElementById('edit-inp-price').value = p.price;
                 
-                // Tampilkan modal
                 document.getElementById('edit-modal').classList.remove('view-hidden');
             }
         };
 
         const closeEditModal = () => {
-            // Sembunyikan modal
             document.getElementById('edit-modal').classList.add('view-hidden');
         };
 
@@ -451,16 +452,13 @@
             
             if (productIndex !== -1) {
                 if (newName !== '' && !isNaN(newPrice) && newPrice >= 0) {
-                    // Update data di array
                     products[productIndex].name = newName;
                     products[productIndex].price = newPrice;
                     
-                    // Simpan ke storage dan refresh
                     localStorage.setItem('aros_products', JSON.stringify(products));
                     renderAdminData();
                     showToast(`Info ${newName} berhasil diperbarui!`);
                     
-                    // Tutup modal
                     closeEditModal();
                 } else {
                     alert("Harap pastikan nama dan harga sudah diisi dengan benar.");
@@ -522,8 +520,11 @@
             let ordersHist = JSON.parse(localStorage.getItem('aros_orders')) || [];
             let expensesHist = JSON.parse(localStorage.getItem('aros_daily_expenses')) || [];
 
-            const incomeToday = ordersHist.filter(o => o.date === todayStr).reduce((acc, o) => acc + o.total, 0);
-            const incomeYesterday = ordersHist.filter(o => o.date === yesterdayStr).reduce((acc, o) => acc + o.total, 0);
+            // Pastikan pemasukan tidak menghitung pesanan dibatalkan
+            const validOrdersHist = ordersHist.filter(o => !(o.status && o.status.startsWith('Pesanan Dibatalkan')));
+            
+            const incomeToday = validOrdersHist.filter(o => o.date === todayStr).reduce((acc, o) => acc + o.total, 0);
+            const incomeYesterday = validOrdersHist.filter(o => o.date === yesterdayStr).reduce((acc, o) => acc + o.total, 0);
             
             const incomeTomorrow = Math.round((incomeToday + incomeYesterday) / 2) || 0; 
 
@@ -644,16 +645,57 @@
             showToast('Status pengiriman berhasil diperbarui!');
         };
 
+        // Fungsi baru untuk menangani status dengan fitur pembatalan pesanan
+        const handleStatusChange = (index, newStatus) => {
+            if (newStatus === 'Pesanan Dibatalkan') {
+                let reason = prompt("Masukkan alasan pembatalan (misal: kurir bermasalah, salah pesanan, stok kosong):");
+                
+                // Jika admin tekan Cancel atau tidak mengisi, batalkan perubahan status
+                if (reason === null || reason.trim() === '') {
+                    renderOrdersTable(); // Kembalikan tampilan dropdown ke status semula
+                    return;
+                }
+                
+                // 1. Simpan pembatalan di pesanan
+                orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
+                let order = orders[index];
+                order.status = `Pesanan Dibatalkan - ${reason}`;
+                localStorage.setItem('aros_orders', JSON.stringify(orders));
+                
+                // 2. Kembalikan jumlah stok produk dan kurangi angka terjual (Restock Otomatis)
+                let prods = JSON.parse(localStorage.getItem('aros_products')) || [];
+                if(order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        let pIdx = prods.findIndex(p => p.name === item.name);
+                        if(pIdx !== -1) {
+                            let qtyToReturn = parseInt(item.qty) || 1;
+                            prods[pIdx].stock += qtyToReturn;
+                            prods[pIdx].sold = Math.max(0, (prods[pIdx].sold || 0) - qtyToReturn);
+                        }
+                    });
+                    localStorage.setItem('aros_products', JSON.stringify(prods));
+                }
+                
+                showToast('Pesanan dibatalkan & Stok barang dikembalikan otomatis!');
+                renderAdminData(); // Refresh UI dashboard (pendapatan dikurangi otomatis)
+                renderOrdersTable(); // Refresh tabel pesanan
+            } else {
+                updateOrderStatus(index, newStatus);
+            }
+        };
+
         const renderOrdersTable = () => {
             orders = JSON.parse(localStorage.getItem('aros_orders')) || [];
             const tbody = document.getElementById('admin-orders-table');
             tbody.innerHTML = '';
+            
             if(orders.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-brand-400">Belum ada transaksi pesanan masuk.</td></tr>`;
                 return;
             }
             
-            const statusOptions = ['Sedang Dikemas', 'Diserahkan ke Logistik', 'Kurir Menuju Lokasi', 'Pesanan Selesai'];
+            // Tambahkan "Pesanan Dibatalkan" di pilihan
+            const statusOptions = ['Sedang Dikemas', 'Diserahkan ke Logistik', 'Kurir Menuju Lokasi', 'Pesanan Selesai', 'Pesanan Dibatalkan'];
 
             [...orders].reverse().forEach((o, reversedIndex) => {
                 const originalIndex = orders.length - 1 - reversedIndex;
@@ -661,11 +703,23 @@
                 let currentStatus = o.status || 'Sedang Dikemas';
                 let paymentMethod = o.paymentMethod || 'Transfer Bank'; 
                 
-                let selectHTML = `<select onchange="updateOrderStatus(${originalIndex}, this.value)" class="text-xs p-2 rounded-lg border border-brand-200 bg-brand-50 text-brand-700 font-bold outline-none cursor-pointer hover:border-brand-400 transition w-full">`;
-                statusOptions.forEach(opt => {
-                    selectHTML += `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`;
-                });
-                selectHTML += `</select>`;
+                let isCancelled = currentStatus.startsWith('Pesanan Dibatalkan');
+                let selectHTML = '';
+                
+                // Jika sudah dibatalkan, kunci status menjadi tulisan label dengan info alasannya
+                if (isCancelled) {
+                    let reasonText = currentStatus.replace('Pesanan Dibatalkan - ', '');
+                    selectHTML = `
+                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold block mb-1 w-max">DIBATALKAN</span>
+                        <span class="text-[10px] text-gray-500 italic block mt-1"><i class="fa-solid fa-circle-info mr-1"></i>${reasonText}</span>
+                    `;
+                } else {
+                    selectHTML = `<select onchange="handleStatusChange(${originalIndex}, this.value)" class="text-xs p-2 rounded-lg border border-brand-200 bg-brand-50 text-brand-700 font-bold outline-none cursor-pointer hover:border-brand-400 transition w-full">`;
+                    statusOptions.forEach(opt => {
+                        selectHTML += `<option value="${opt}" ${currentStatus === opt ? 'selected' : ''}>${opt}</option>`;
+                    });
+                    selectHTML += `</select>`;
+                }
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-brand-50 transition">
