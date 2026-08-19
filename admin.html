@@ -62,7 +62,7 @@
                 </div>
                 
                 <div>
-                    <label for="edit-inp-price" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Harga (Rp)</label>
+                    <label for="edit-inp-price" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Harga Jual (Rp)</label>
                     <input type="number" id="edit-inp-price" class="input-minimal mt-2 font-medium" required placeholder="Contoh: 1200000">
                 </div>
                 
@@ -75,7 +75,7 @@
     </div>
     <!-- AKHIR MODAL EDIT PRODUK -->
 
-    <!-- MODAL RESTOCK / SUPLAI TOKO -->
+    <!-- MODAL RESTOCK / SUPLAI TOKO (DENGAN HITUNG OTOMATIS) -->
     <div id="restock-modal" class="fixed inset-0 bg-brand-900/60 z-50 view-hidden flex items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-8 fade-in relative">
             <button onclick="closeRestockModal()" class="absolute top-4 right-4 text-brand-400 hover:text-red-500 transition">
@@ -84,34 +84,41 @@
             
             <div class="mb-6">
                 <h3 class="text-2xl font-bold text-brand-900">Beli Suplai Toko</h3>
-                <p class="text-xs text-brand-500 mt-1">Tambah stok dari supplier dan catat modal ke pengeluaran otomatis.</p>
+                <p class="text-xs text-brand-500 mt-1">Sistem akan otomatis menghitung total modal pengeluaranmu.</p>
                 <div id="restock-product-name" class="mt-4 p-3 bg-brand-50 rounded-lg text-sm font-bold text-brand-700 border border-brand-100 text-center"></div>
             </div>
             
-            <form onsubmit="saveRestockData(event)" class="space-y-5">
+            <form onsubmit="saveRestockData(event)" class="space-y-4">
                 <input type="hidden" id="restock-inp-id">
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="restock-inp-qty" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Qty Suplai Baru</label>
-                        <input type="number" id="restock-inp-qty" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="1">
+                        <input type="number" id="restock-inp-qty" oninput="calculateTotalRestock()" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="1">
                     </div>
                     <div>
-                        <label for="restock-inp-sizes" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Ukuran (Pisah Koma)</label>
-                        <input type="text" id="restock-inp-sizes" class="input-minimal mt-1 font-medium text-sm" placeholder="39, 40, 41...">
+                        <label for="restock-inp-unit-cost" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Modal per Pasang (Rp)</label>
+                        <input type="number" id="restock-inp-unit-cost" oninput="calculateTotalRestock()" class="input-minimal mt-1 font-bold text-brand-700 text-lg" required placeholder="0" min="0">
                     </div>
                 </div>
-                
+
                 <div>
-                    <label for="restock-inp-cost" class="text-xs uppercase tracking-widest text-brand-500 font-bold">Total Harga Beli (Modal Pabrik)</label>
-                    <div class="flex items-center gap-2 mt-1">
-                        <span class="text-brand-500 font-bold">Rp</span>
-                        <input type="number" id="restock-inp-cost" class="input-minimal font-bold text-brand-700 text-lg w-full" required placeholder="0" min="0">
-                    </div>
-                    <p class="text-[10px] text-red-400 mt-1 italic">*Nominal ini akan otomatis memotong laba harian toko.</p>
+                    <label for="restock-inp-sizes" class="text-[10px] uppercase tracking-widest text-brand-500 font-bold">Ukuran Tersedia (Pisah Koma)</label>
+                    <input type="text" id="restock-inp-sizes" class="input-minimal mt-1 font-medium text-sm" placeholder="39, 40, 41...">
                 </div>
                 
-                <div class="flex gap-3 pt-4 border-t border-brand-50 mt-2">
+                <div class="mt-2">
+                    <label class="text-xs uppercase tracking-widest text-brand-500 font-bold">Total Harga Beli (Otomatis)</label>
+                    <div class="flex justify-between items-center bg-red-50 border border-red-100 rounded-xl p-4 mt-2">
+                        <span class="text-xs text-red-500 font-bold uppercase tracking-widest">Total:</span>
+                        <span id="restock-display-total" class="text-2xl font-black text-red-600">Rp 0</span>
+                    </div>
+                    <!-- Input tersembunyi ini yang akan menyimpan nilai hitungan untuk database -->
+                    <input type="hidden" id="restock-inp-total-cost" value="0">
+                    <p class="text-[10px] text-red-400 mt-1 italic">*Nominal ini akan otomatis memotong laba harian toko sebagai pengeluaran.</p>
+                </div>
+                
+                <div class="flex gap-3 pt-4 border-t border-brand-50 mt-4">
                     <button type="button" onclick="closeRestockModal()" class="w-full bg-brand-50 text-brand-600 px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-brand-100 transition">Batal</button>
                     <button type="submit" class="w-full bg-emerald-500 text-white px-4 py-3 rounded-xl uppercase tracking-wider text-xs font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-500/30"><i class="fa-solid fa-truck-fast mr-1"></i> Simpan Suplai</button>
                 </div>
@@ -509,6 +516,18 @@
         };
 
         /* ================= FUNGSI UNTUK MODAL RESTOCK / SUPLAI ================= */
+        // Fungsi baru untuk Kalkulator Otomatis
+        const calculateTotalRestock = () => {
+            const qty = parseInt(document.getElementById('restock-inp-qty').value) || 0;
+            const unitCost = parseInt(document.getElementById('restock-inp-unit-cost').value) || 0;
+            const total = qty * unitCost;
+            
+            // Masukkan ke input tersembunyi (untuk diproses JS)
+            document.getElementById('restock-inp-total-cost').value = total;
+            // Tampilkan di teks yang bagus secara visual
+            document.getElementById('restock-display-total').innerText = formatRupiah(total);
+        };
+
         const openRestockModal = (id) => {
             let products = JSON.parse(localStorage.getItem('aros_products')) || [];
             let p = products.find(prod => prod.id === id);
@@ -516,8 +535,12 @@
             if(p) {
                 document.getElementById('restock-inp-id').value = p.id;
                 document.getElementById('restock-product-name').innerText = p.name;
+                
+                // Reset semua input saat modal dibuka
                 document.getElementById('restock-inp-qty').value = '';
-                document.getElementById('restock-inp-cost').value = '';
+                document.getElementById('restock-inp-unit-cost').value = '';
+                document.getElementById('restock-inp-total-cost').value = '0';
+                document.getElementById('restock-display-total').innerText = 'Rp 0';
                 document.getElementById('restock-inp-sizes').value = p.sizes ? p.sizes.join(', ') : '39, 40, 41, 42, 43';
                 
                 document.getElementById('restock-modal').classList.remove('view-hidden');
@@ -533,7 +556,7 @@
             let products = JSON.parse(localStorage.getItem('aros_products')) || [];
             let idToEdit = parseInt(document.getElementById('restock-inp-id').value);
             let qty = parseInt(document.getElementById('restock-inp-qty').value);
-            let cost = parseInt(document.getElementById('restock-inp-cost').value);
+            let cost = parseInt(document.getElementById('restock-inp-total-cost').value); // Ambil dari hasil hitung otomatis
             let sizesStr = document.getElementById('restock-inp-sizes').value;
 
             let productIndex = products.findIndex(prod => prod.id === idToEdit);
